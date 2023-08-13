@@ -1,5 +1,8 @@
 #!/bin/bash
 
+source ./common-constants.inc;
+source ./functions.inc;
+
 function output_header() {
 	if [[ $CSV == "True" ]]; then
 		output_csv_header;
@@ -35,48 +38,19 @@ function output_subscription_text() {
 	echo $BLANK_LINE;
 };
 
-declare BLANK_LINE="";
-declare DEBUG="False";
-declare CSV="False";
-declare HELP=$(cat << EOL
-	$0 [-c, --csv] [-d, --debug] [-h, --help]	
-EOL
-);
+source ./common-menu.inc;
 
-for arg in "$@"; do
-  shift
-  case "$arg" in
-    "--help") 			set -- "$@" "-h" ;;
-    "--debug") 			set -- "$@" "-d" ;;
-    "--csv") 			set -- "$@" "-c" ;;
-    *)        			set -- "$@" "$arg"
-  esac
-done
-
-while getopts "hdc" option
-do 
-    case "${option}" in
-        d)
-        	DEBUG="True";;
-        c)
-        	CSV="True";;
-        h)
-        	echo $HELP; 
-        	exit 0;;
-    esac;
-done;
-
-declare RESULTS=$(az account subscription list --output="json" 2>/dev/null);
+declare SUBSCRIPTIONS=$(get_subscriptions $p_SUBSCRIPTION_ID);
 
 if [[ $DEBUG == "True" ]]; then
-	echo "Subscriptions (JSON): $RESULTS";
+	echo "Subscriptions (JSON): $SUBSCRIPTIONS";
 fi;
-
-if [[ $RESULTS != "[]" ]]; then
+	
+if [[ $SUBSCRIPTIONS != "[]" ]]; then
 
 	output_header;
 		
-	echo $RESULTS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION;do
+	echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION;do
 
 		SUBSCRIPTION_NAME=$(echo $SUBSCRIPTION | jq -rc '.displayName');
 		SUBSCRIPTION_STATE=$(echo $SUBSCRIPTION | jq -rc '.state');
