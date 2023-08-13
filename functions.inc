@@ -37,7 +37,19 @@ function get_azure_sql_servers() {
 
 	local l_SUBSCRIPTION_ID=$1;
 	local l_RESOURCE_GROUP_NAME=$2;
+	
 	local l_RESULTS=$(az sql server list --output="json" --subscription="$l_SUBSCRIPTION_ID" --resource-group="$l_RESOURCE_GROUP_NAME" 2>/dev/null);
 	
+	echo $l_RESULTS;
+}
+
+function get_azure_sql_server_firewall_rules() {
+
+	local l_SUBSCRIPTION_ID=$1;
+	local l_RESOURCE_GROUP_NAME=$2;
+	local l_SQL_SERVER_NAME=$3;
+	
+	local l_RESULTS=$(az sql server firewall-rule list --subscription="$l_SUBSCRIPTION_ID" --resource-group="$l_RESOURCE_GROUP_NAME" --server="$l_SQL_SERVER_NAME" --output="json" 2>/dev/null);
+
 	echo $l_RESULTS;
 }
