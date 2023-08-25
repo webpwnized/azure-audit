@@ -107,6 +107,8 @@ function parse_sql_server() {
 	SQL_SERVER_TYPE=$(echo $SQL_SERVER | jq -rc '.type');
 	SQL_SERVER_VERSION=$(echo $SQL_SERVER | jq -rc '.version');
 
+	# The default for the Public network access setting is Disable. Customers can choose to connect to a database by using either public endpoints (with IP-based server-level firewall rules or with virtual-network firewall rules), or private endpoints (by using Azure Private Link).
+	# https://learn.microsoft.com/en-us/azure/azure-sql/database/connectivity-settings?view=azuresql&tabs=azure-portal
 	SQL_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="False";
 	if [[ $SQL_SERVER_PUBLIC_NETWORK_ACCESS == "Enabled" ]]; then
 		SQL_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="True";
@@ -130,11 +132,13 @@ function parse_sql_server_firewall_rule() {
 	
 	# Ensure the output does not contain any firewall allow rules with a source of 0.0.0.0, or any rules named AllowAllWindowsAzureIps, or any public IP addresses.
 	
+	# This option configures the firewall to allow all connections from Azure, including connections from the subscriptions of other customers.
 	FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG="False";
 	if [[ $FIREWALL_RULE_NAME == "AllowAllWindowsAzureIps" ]]; then
 		FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG="True";
 	fi;
 
+	# This option allows connections from one or more IP addresses on the Internet
 	FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG="False";
 	if [[ ! $FIREWALL_RULE_START_IP_ADDRESS =~ ^10\. && ! $FIREWALL_RULE_START_IP_ADDRESS =~ ^172\.16\. && ! $FIREWALL_RULE_START_IP_ADDRESS =~ ^192\.168\. && ! $FIREWALL_RULE_START_IP_ADDRESS =~ ^127\. ]]; then
 		FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG="True";
