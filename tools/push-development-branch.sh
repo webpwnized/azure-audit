@@ -1,27 +1,36 @@
 #!/bin/bash
 
-if (( $# != 2 ))
-then
-    printf "%b" "Usage: git.sh <version> <annotation>\n" >&2;
-    exit 1;
-fi;
+# Check if the correct number of arguments is provided
+if (( $# != 2 )); then
+    printf "%b" "Usage: git.sh <version> <annotation>\n" >&2
+    exit 1
+fi
 
-VERSION=$1;
-ANNOTATION=$2;
+# Assign command-line arguments to variables
+VERSION="$1"
+ANNOTATION="$2"
 
-echo "Calling git.sh with tag $VERSION with annotation \"$ANNOTATION\"";
-./git.sh "$VERSION" "$ANNOTATION";
+# Inform user about the tag creation
+echo "Creating tag $VERSION with annotation \"$ANNOTATION\""
+# Create annotated tag with version and annotation
+./git.sh "$VERSION" "$ANNOTATION"
 
-echo "Checking out main branch";
-git checkout main;
+# Inform user about switching to the main branch
+echo "Switching to the main branch"
+git checkout main
 
-echo "Merging development branch";
-git merge development;
+# Inform user about merging the development branch into the main branch
+echo "Merging development branch into main"
+git merge development
 
-echo "Calling git.sh with tag $VERSION with annotation \"$ANNOTATION\"";
-./git.sh "$VERSION" "$ANNOTATION";
+# Inform user about the tag creation again
+echo "Creating tag $VERSION with annotation \"$ANNOTATION\""
+# Create annotated tag with version and annotation
+./git.sh "$VERSION" "$ANNOTATION"
 
-echo "Checking out development branch";
-git checkout development;
+# Inform user about switching back to the development branch
+echo "Switching back to the development branch"
+git checkout development
 
-git status;
+# Show current status after operations
+git status

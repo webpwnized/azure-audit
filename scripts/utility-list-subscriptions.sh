@@ -53,6 +53,37 @@ function parse_subscription() {
     SUBSCRIPTION_ID=$(echo $SUBSCRIPTION | jq -rc '.subscriptionId')
 }
 
+# Process role assignments
+function process_role_assignments() {
+    declare -A unique_members  # Declare an associative array to store unique members
+    
+    while IFS='' read -r ROLE_ASSIGNMENT; do
+        PRINCIPLE_TYPE=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.principalType')
+
+        if [[ $PRINCIPLE_TYPE == "User" ]]; then
+            PRINCIPLE_NAME=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.principalName')
+            unique_members["$PRINCIPLE_NAME"]=1  # Store unique user in the associative array
+        elif [[ $PRINCIPLE_TYPE == "Group" ]]; then
+            GROUP_NAME=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.principalName')
+            ROLE=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.roleDefinitionName')
+            GROUP_MEMBERS=$(get_group_members_serialized "$GROUP_NAME")
+
+            # Split group members and add unique members to the associative array
+            IFS=';' read -ra members_array <<< "$GROUP_MEMBERS"
+            for member in "${members_array[@]}"; do
+                unique_members["$member"]=1
+            done
+        fi   
+    done <<< "$(echo "$1" | jq -rc '.[]')"
+
+    # Concatenate unique members from the associative array
+    MEMBERS=""
+    for member in "${!unique_members[@]}"; do
+        MEMBERS+="$member;"
+    done
+}
+
+
 # Source common menu
 source ./common-menu.inc
 
@@ -75,26 +106,8 @@ if [[ $SUBSCRIPTIONS != "[]" ]]; then
         # Get role assignments and store in a variable
         ROLE_ASSIGNMENTS=$(get_subscription_role_assignments "$SUBSCRIPTION_NAME")
 
-        # Initialize MEMBERS variable
-        MEMBERS=""
-
-        # Iterate through each role assignment using a while loop
-        while IFS='' read -r ROLE_ASSIGNMENT; do
-            PRINCIPLE_TYPE=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.principalType')
-
-            if [[ $PRINCIPLE_TYPE == "User" ]]; then
-                PRINCIPLE_NAME=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.principalName')
-                MEMBERS="$MEMBERS$PRINCIPLE_NAME;"
-            elif [[ $PRINCIPLE_TYPE == "Group" ]]; then
-                GROUP_NAME=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.principalName')
-                ROLE=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.roleDefinitionName')
-                GROUP_MEMBERS=$(get_group_members_serialized "$GROUP_NAME")
-
-                if [[ $GROUP_MEMBERS != "" ]]; then
-                    MEMBERS="$MEMBERS$GROUP_MEMBERS;"
-                fi
-            fi   
-        done <<< "$(echo "$ROLE_ASSIGNMENTS" | jq -rc '.[]')"
+        # Process role assignments
+        process_role_assignments "$ROLE_ASSIGNMENTS"
 
         output_subscription
     done
@@ -102,3 +115,5 @@ else
     echo "No subscriptions found"
     echo $BLANK_LINE
 fi
+
+
