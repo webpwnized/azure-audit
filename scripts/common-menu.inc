@@ -1,17 +1,23 @@
 #!/bin/bash
 
+# Declare variables for subscription and resource group
 declare p_SUBSCRIPTION="";
 declare p_RESOURCE_GROUP="";
 
+# Declare variables for debug and csv flags
 declare DEBUG="False";
 declare CSV="False";
+
+# Declare a variable for help message
 declare HELP=$(cat << EOL
-	$0 [-c, --csv] [-d, --debug] [-h, --help] [-s <SUBSCRIPTION_ID>, --subscription <SUBSCRIPTION_ID> ] [-r <RESOURCE_GROUP_NAME>, --resource-group <RESOURCE_GROUP_NAME>]
+    $0 [-c, --csv] [-d, --debug] [-h, --help] [-s <SUBSCRIPTION_ID>, --subscription <SUBSCRIPTION_ID> ] [-r <RESOURCE_GROUP_NAME>, --resource-group <RESOURCE_GROUP_NAME>]
 EOL
 );
 
+# Loop through all arguments
 for arg in "$@"; do
   shift
+  # Match argument to its short form
   case "$arg" in
     "--help") 			set -- "$@" "-h" ;;
     "--debug") 			set -- "$@" "-d" ;;
@@ -22,20 +28,25 @@ for arg in "$@"; do
   esac
 done
 
+# Process all short form arguments
 while getopts "hdcs:r:" option
 do 
     case "${option}" in
         d)
-        	DEBUG="True";;
+            # Set debug flag to true
+            DEBUG="True";;
         c)
-        	CSV="True";;
+            # Set csv flag to true
+            CSV="True";;
         h)
-        	echo $HELP; 
-        	exit 0;;
+            # Print help message and exit
+            echo $HELP; 
+            exit 0;;
         s)
-        	p_SUBSCRIPTION_ID="${OPTARG}";;
+            # Set subscription id
+            p_SUBSCRIPTION_ID="${OPTARG}";;
         r)
-        	p_RESOURCE_GROUP_NAME="${OPTARG}";;
+            # Set resource group name
+            p_RESOURCE_GROUP_NAME="${OPTARG}";;
     esac;
 done;
-
