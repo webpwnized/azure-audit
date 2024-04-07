@@ -10,6 +10,12 @@ fi
 VERSION="$1"
 ANNOTATION="$2"
 
+# Validate input
+if [[ -z "$VERSION" || -z "$ANNOTATION" ]]; then
+    echo "Error: Version and annotation cannot be empty."
+    exit 1
+fi
+
 # Inform user about the tag creation
 echo "Creating tag $VERSION with annotation \"$ANNOTATION\""
 # Create annotated tag with version and annotation
