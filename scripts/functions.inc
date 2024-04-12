@@ -33,6 +33,21 @@ function get_resource_groups() {
     echo "$l_RESULTS"
 }
 
+# Function to get Network Security Groups
+# Example: declare NSGS=$(get_network_security_groups "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME");
+function get_network_security_groups() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    
+    # Get Security Rules
+    az network nsg list \
+        --output="json" \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" \
+        2>/dev/null  \
+        | jq -r 'map({ name: .name, location: .location, securityRules: (.securityRules | map(del(.etag))) })'
+}
+
 # Function to get Azure SQL servers
 function get_azure_sql_servers() {
     local l_SUBSCRIPTION_ID="$1"
