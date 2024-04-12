@@ -97,61 +97,55 @@ function parse_resource_group() {
 
 # Function to parse SQL server information
 function parse_sql_server() {
-	local l_SQL_SERVER=$1;
-	
-	# Parse SQL server information from JSON
-	SQL_SERVER_NAME=$(echo $SQL_SERVER | jq -rc '.name');
-	SQL_SERVER_ENVIRONMENT=$(echo $SQL_SERVER | jq -rc '.tags.Environment');
-	SQL_SERVER_APPLICATION_CODE=$(echo $SQL_SERVER | jq -rc '.tags.applicationCode');
-	SQL_SERVER_APPLICATION_NAME=$(echo $SQL_SERVER | jq -rc '.tags.applicationName');
-	SQL_SERVER_REQUESTOR_AD_ID=$(echo $SQL_SERVER | jq -rc '.tags.requestorADID');
-	SQL_SERVER_REQUESTOR_EMPLOYEE_ID=$(echo $SQL_SERVER | jq -rc '.tags.requestorEmployeeID');
-	SQL_SERVER_ADMIN_LOGIN=$(echo $SQL_SERVER | jq -rc '.administratorLogin');
-	SQL_SERVER_ADMIN_TYPE=$(echo $SQL_SERVER | jq -rc '.administrators.administratorType');
-	SQL_SERVER_ADMIN_PRINCIPLE_TYPE=$(echo $SQL_SERVER | jq -rc '.administrators.principalType');
-	SQL_SERVER_ADMIN_PRINCIPLE_LOGIN=$(echo $SQL_SERVER | jq -rc '.administrators.login');
-	SQL_SERVER_ADMIN_AZURE_LOGIN_ENABLED_FLAG=$(echo $SQL_SERVER | jq -rc '.administrators.azureAdOnlyAuthentication');
-	SQL_SERVER_DOMAIN_NAME=$(echo $SQL_SERVER | jq -rc '.fullyQualifiedDomainName');
-	SQL_SERVER_LOCATION=$(echo $SQL_SERVER | jq -rc '.location');
-	SQL_SERVER_TLS_VERSION=$(echo $SQL_SERVER | jq -rc '.minimalTlsVersion');
-	SQL_SERVER_PUBLIC_NETWORK_ACCESS=$(echo $SQL_SERVER | jq -rc '.publicNetworkAccess');
-	SQL_SERVER_RESTRICT_OUTBOUND_ACCESS=$(echo $SQL_SERVER | jq -rc '.restrictOutboundNetworkAccess');
-	SQL_SERVER_TYPE=$(echo $SQL_SERVER | jq -rc '.type');
-	SQL_SERVER_VERSION=$(echo $SQL_SERVER | jq -rc '.version');
+    local l_SQL_SERVER=$1;
+    
+    # Parse SQL server information from JSON
+    SQL_SERVER_NAME=$(jq -rc '.name // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_ENVIRONMENT=$(jq -rc '.tags.Environment // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_APPLICATION_CODE=$(jq -rc '.tags.applicationCode // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_APPLICATION_NAME=$(jq -rc '.tags.applicationName // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_REQUESTOR_AD_ID=$(jq -rc '.tags.requestorADID // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_REQUESTOR_EMPLOYEE_ID=$(jq -rc '.tags.requestorEmployeeID // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_ADMIN_LOGIN=$(jq -rc '.administratorLogin // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_ADMIN_TYPE=$(jq -rc '.administrators.administratorType // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_ADMIN_PRINCIPLE_TYPE=$(jq -rc '.administrators.principalType // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_ADMIN_PRINCIPLE_LOGIN=$(jq -rc '.administrators.login // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_ADMIN_AZURE_LOGIN_ENABLED_FLAG=$(jq -rc '.administrators.azureAdOnlyAuthentication // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_DOMAIN_NAME=$(jq -rc '.fullyQualifiedDomainName // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_LOCATION=$(jq -rc '.location // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_TLS_VERSION=$(jq -rc '.minimalTlsVersion // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_PUBLIC_NETWORK_ACCESS=$(jq -rc '.publicNetworkAccess // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_RESTRICT_OUTBOUND_ACCESS=$(jq -rc '.restrictOutboundNetworkAccess // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_TYPE=$(jq -rc '.type // ""' <<< "$l_SQL_SERVER")
+    SQL_SERVER_VERSION=$(jq -rc '.version // ""' <<< "$l_SQL_SERVER")
 
-	# Determine flags for public network access and outbound access violation
-	SQL_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="False";
-	if [[ $SQL_SERVER_PUBLIC_NETWORK_ACCESS == "Enabled" ]]; then
-		SQL_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="True";
-	fi;
+    # Determine flags for public network access and outbound access violation
+    SQL_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="False"
+    [[ $SQL_SERVER_PUBLIC_NETWORK_ACCESS == "Enabled" ]] && SQL_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="True"
 
-	SQL_SERVER_OUTBOUND_NETWORK_ACCESS_VIOLATION_FLAG="False";
-	if [[ $SQL_SERVER_RESTRICT_OUTBOUND_ACCESS != "Enable" ]]; then
-		SQL_SERVER_OUTBOUND_NETWORK_ACCESS_VIOLATION_FLAG="True";
-	fi;
-};
+    SQL_SERVER_OUTBOUND_NETWORK_ACCESS_VIOLATION_FLAG="False"
+    [[ $SQL_SERVER_RESTRICT_OUTBOUND_ACCESS != "Enable" ]] && SQL_SERVER_OUTBOUND_NETWORK_ACCESS_VIOLATION_FLAG="True"
+}
 
 # Function to parse SQL server firewall rule information
 function parse_sql_server_firewall_rule() {
-	local l_FIREWALL_RULE=$1;
+    local l_FIREWALL_RULE=$1
 
-	# Parse SQL server firewall rule information from JSON
-	FIREWALL_RULE_NAME=$(echo $l_FIREWALL_RULE | jq -rc '.name');
-	FIREWALL_RULE_START_IP_ADDRESS=$(echo $l_FIREWALL_RULE | jq -rc '.startIpAddress');
-	FIREWALL_RULE_END_IP_ADDRESS=$(echo $l_FIREWALL_RULE | jq -rc '.endIpAddress');
-	FIREWALL_RULE_RESOURCE_GROUP=$(echo $l_FIREWALL_RULE | jq -rc '.resourceGroup');
-	
-	# Determine flags for firewall rule violation
-	FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG="False";
-	if [[ $FIREWALL_RULE_NAME == "AllowAllWindowsAzureIps" ]]; then
-		FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG="True";
-	fi;
+    # Parse SQL server firewall rule information from JSON
+    FIREWALL_RULE_NAME=$(jq -rc '.name' <<< "$l_FIREWALL_RULE")
+    FIREWALL_RULE_START_IP_ADDRESS=$(jq -rc '.startIpAddress' <<< "$l_FIREWALL_RULE")
+    FIREWALL_RULE_END_IP_ADDRESS=$(jq -rc '.endIpAddress' <<< "$l_FIREWALL_RULE")
+    FIREWALL_RULE_RESOURCE_GROUP=$(jq -rc '.resourceGroup' <<< "$l_FIREWALL_RULE")
 
-	FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG="False";
-	if [[ ! $FIREWALL_RULE_START_IP_ADDRESS =~ ^10\. && ! $FIREWALL_RULE_START_IP_ADDRESS =~ ^172\.16\. && ! $FIREWALL_RULE_START_IP_ADDRESS =~ ^192\.168\. && ! $FIREWALL_RULE_START_IP_ADDRESS =~ ^127\. ]]; then
-		FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG="True";
-	fi;
-};
+    # Determine flags for firewall rule violation
+    FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG="False"
+    [[ $FIREWALL_RULE_NAME == "AllowAllWindowsAzureIps" ]] && FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG="True"
+
+    FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG="False"
+    if ! [[ $FIREWALL_RULE_START_IP_ADDRESS =~ ^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|127\.) ]]; then
+        FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG="True"
+    fi
+}
 
 # Include common menu
 source ./common-menu.inc;
