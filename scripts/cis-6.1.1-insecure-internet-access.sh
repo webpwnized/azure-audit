@@ -3,7 +3,7 @@
 # Reference: 
 # https://learn.microsoft.com/en-us/azure/azure-sql/database/security-overview?view=azuresql
 
-# Debug: ./cis-4.1.2-azure-sql-databases-allowing-ingress.sh --subscription b09bcb9d-e055-4950-a9dd-2ab6002ef86c --resource-group rg-scd-dev
+# Debug: ./cis-6.1.1-insecure-internet-access.sh -s 1014e3e6-e0cf-44c0-8efe-ba17d0c6e3ed -r rg-scd-prd
 
 # Include common constants and functions
 source ./common-constants.inc;
@@ -16,71 +16,155 @@ function output_header() {
 	fi
 }
 
-# Function to output CSV header
-function output_csv_header() {
-	echo "\"SUBSCRIPTION_NAME\",\"RESOURCE_GROUP_NAME\",\"RESOURCE_GROUP_APPLICATION_CODE\",\"RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"RESOURCE_GROUP_PAR\",\"RESOURCE_GROUP_REQUESTOR_AD_ID\",\"RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"SECURITY_RULE_NAME\",\"SECURITY_RULE_DOMAIN_NAME\",\"SECURITY_RULE_TYPE\",\"SECURITY_RULE_ENVIRONMENT\",\"SECURITY_RULE_APPLICATION_CODE\",\"SECURITY_RULE_APPLICATION_NAME\",\"SECURITY_RULE_REQUESTOR_AD_ID\",\"SECURITY_RULE_REQUESTOR_EMPLOYEE_ID\",\"SECURITY_RULE_PUBLIC_NETWORK_ACCESS\",\"SECURITY_RULE_RESTRICT_OUTBOUND_ACCESS\",\"SECURITY_RULE_ADMIN_LOGIN\",\"SECURITY_RULE_ADMIN_TYPE\",\"SECURITY_RULE_ADMIN_PRINCIPLE_TYPE\",\"SECURITY_RULE_ADMIN_PRINCIPLE_LOGIN\",\"SECURITY_RULE_ADMIN_AZURE_LOGIN_ENABLED_FLAG\",\"SECURITY_RULE_TLS_VERSION\",\"SECURITY_RULE_LOCATION\",\"SECURITY_RULE_VERSION\",\"SECURITY_RULE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\",\"SECURITY_RULE_OUTBOUND_NETWORK_ACCESS_VIOLATION_FLAG\",\"FIREWALL_RULE_NAME\",\"FIREWALL_RULE_START_IP_ADDRESS\",\"FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG\",\"FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG\"";
-};
-
-# Function to output Security Rule firewall rule in CSV format
-function output_SECURITY_RULE_firewall_rule_csv() {
-	echo "\"$SUBSCRIPTION_NAME\",\"$RESOURCE_GROUP_NAME\",\"$RESOURCE_GROUP_APPLICATION_CODE\",\"$RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"$RESOURCE_GROUP_PAR\",\"$RESOURCE_GROUP_REQUESTOR_AD_ID\",\"$RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"$SECURITY_RULE_NAME\",\"$SECURITY_RULE_DOMAIN_NAME\",\"$SECURITY_RULE_TYPE\",\"$SECURITY_RULE_ENVIRONMENT\",\"$SECURITY_RULE_APPLICATION_CODE\",\"$SECURITY_RULE_APPLICATION_NAME\",\"$SECURITY_RULE_REQUESTOR_AD_ID\",\"$SECURITY_RULE_REQUESTOR_EMPLOYEE_ID\",\"$SECURITY_RULE_PUBLIC_NETWORK_ACCESS\",\"$SECURITY_RULE_RESTRICT_OUTBOUND_ACCESS\",\"$SECURITY_RULE_ADMIN_LOGIN\",\"$SECURITY_RULE_ADMIN_TYPE\",\"$SECURITY_RULE_ADMIN_PRINCIPLE_TYPE\",\"$SECURITY_RULE_ADMIN_PRINCIPLE_LOGIN\",\"$SECURITY_RULE_ADMIN_AZURE_LOGIN_ENABLED_FLAG\",\"$SECURITY_RULE_TLS_VERSION\",\"$SECURITY_RULE_LOCATION\",\"$SECURITY_RULE_VERSION\",\"$SECURITY_RULE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\",\"$SECURITY_RULE_OUTBOUND_NETWORK_ACCESS_VIOLATION_FLAG\",\"$FIREWALL_RULE_NAME\",\"$FIREWALL_RULE_START_IP_ADDRESS\",\"$FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG\",\"$FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG\"";
-};
-
 # Function to output Security Rule firewall rule
-function output_SECURITY_RULE_firewall_rule() {
+function output_security_rule() {
 	if [[ $RESOURCE_GROUP_NAME != "Visual Studio"* ]]; then
-		output_SECURITY_RULE_firewall_rule_helper;
+		output_security_rule_helper;
 	fi;
 };
 
 # Helper function to output Security Rule firewall rule
-function output_SECURITY_RULE_firewall_rule_helper() {
+function output_security_rule_helper() {
 	if [[ $CSV == "True" ]]; then
-		output_SECURITY_RULE_firewall_rule_csv;
+		output_security_rule_csv;
 	else
-		output_SECURITY_RULE_firewall_rule_text;
+		output_security_rule_text;
 	fi;
 };
 
+# Function to output Source Address Prefix
+function output_source_address_prefix() {
+    if [[ -n "$SECURITY_RULE_SOURCE_ADDRESS_PREFIXES" ]]; then
+        echo "Source Address Prefixes: $SECURITY_RULE_SOURCE_ADDRESS_PREFIXES"
+    else
+        echo "Source Address Prefix: $SECURITY_RULE_SOURCE_ADDRESS_PREFIX"
+    fi
+}
+
+# Function to output Source Port Ranges
+function output_source_port_ranges() {
+    if [[ -n "$SECURITY_RULE_SOURCE_PORT_RANGES" ]]; then
+        echo "Source Port Ranges: $SECURITY_RULE_SOURCE_PORT_RANGES"
+    else
+        echo "Source Port Range: $SECURITY_RULE_SOURCE_PORT_RANGE"
+    fi
+}
+
+# Function to output Destination Address Prefix
+function output_destination_address_prefix() {
+    if [[ -n "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIXES" ]]; then
+        echo "Destination Address Prefixes: $SECURITY_RULE_DESTINATION_ADDRESS_PREFIXES"
+    else
+        echo "Destination Address Prefix: $SECURITY_RULE_DESTINATION_ADDRESS_PREFIX"
+    fi
+}
+
+# Function to output Destination Port Ranges
+function output_destination_port_ranges() {
+    if [[ -n "$SECURITY_RULE_DESTINATION_PORT_RANGES" ]]; then
+        echo "Destination Port Ranges: $SECURITY_RULE_DESTINATION_PORT_RANGES"
+    else
+        echo "Destination Port Range: $SECURITY_RULE_DESTINATION_PORT_RANGE"
+    fi
+}
+
+# Function to output Virtual Network Note and Other Notes
+function output_notes() {
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "VirtualNetwork" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "VirtualNetwork" ]]; then
+        echo "Note: VirtualNetwork means that traffic is allowed from all resources within the same virtual network."
+    fi
+    
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "AzureLoadBalancer" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "AzureLoadBalancer" ]]; then
+        echo "Note: AzureLoadBalancer means that traffic is allowed from Azure Load Balancer."
+    fi
+    
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "CorpNetPublic" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "CorpNetPublic" ]]; then
+        echo "Note: CorpNetPublic means that traffic is allowed from a public IP range associated with the organization's corporate network."
+    fi
+    
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "CorpNetSaw" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "CorpNetSaw" ]]; then
+        echo "Note: CorpNetSaw means that traffic is allowed from a subnet associated with the organization's corporate network."
+    fi
+    
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Internet" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "Internet" ]]; then
+        echo "Note: Internet means that traffic is allowed from or to the Internet."
+    fi
+    
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Any" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "Any" ]]; then
+        echo "Note: Any means that traffic is allowed from or to any source or destination."
+    fi
+    
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "/0" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "/0" ]]; then
+        echo "Note: /0 means that traffic is allowed from or to any source or destination IP address."
+    fi
+    
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "0.0.0.0" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "0.0.0.0" ]]; then
+        echo "Note: 0.0.0.0 means that traffic is allowed from or to any IP address."
+    fi
+    
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Sqlmanagement" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "Sqlmanagement" ]]; then
+        echo "Note: Sqlmanagement represents traffic from or to Azure SQL Management services."
+    fi
+    
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "AzureCloud" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "AzureCloud" ]]; then
+        echo "Note: AzureCloud represents traffic from or to Azure Cloud infrastructure."
+    fi
+}
+
+# Function to output CSV header
+function output_csv_header() {
+    cat <<EOF
+"SUBSCRIPTION_NAME","RESOURCE_GROUP_NAME","RESOURCE_GROUP_APPLICATION_CODE","RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE","RESOURCE_GROUP_PAR","RESOURCE_GROUP_REQUESTOR_AD_ID","RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID","NETWORK_SECURITY_GROUP_NAME","NETWORK_SECURITY_GROUP_LOCATION","VIOLATION","OPEN_FROM_INTERNET_VIOLATION","RDP_VIOLATION","SSH_VIOLATION","SECURITY_RULE_NAME","SECURITY_RULE_DESCRIPTION","SECURITY_RULE_ACCESS_CONTROL","SECURITY_RULE_DIRECTION","SECURITY_RULE_PROTOCOL","SOURCE_ADDRESS_PREFIX","SOURCE_PORT_RANGES","DESTINATION_ADDRESS_PREFIX","DESTINATION_PORT_RANGES","NOTES"
+EOF
+}
+
+# Function to output Security Rule firewall rule in CSV format
+function output_security_rule_csv() {
+    echo -n "\"$SUBSCRIPTION_NAME\",\"$RESOURCE_GROUP_NAME\",\"$RESOURCE_GROUP_APPLICATION_CODE\",\"$RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"$RESOURCE_GROUP_PAR\",\"$RESOURCE_GROUP_REQUESTOR_AD_ID\",\"$RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"$NETWORK_SECURITY_GROUP_NAME\",\"$NETWORK_SECURITY_GROUP_LOCATION\",\"$SECURITY_RULE_VIOLATION\",\"$SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION\",\"$SECURITY_RULE_RDP_VIOLATION\",\"$SECURITY_RULE_SSH_VIOLATION\",\"$SECURITY_RULE_NAME\",\"$SECURITY_RULE_DESCRIPTION\",\"$SECURITY_RULE_ACCESS_CONTROL\",\"$SECURITY_RULE_DIRECTION\",\"$SECURITY_RULE_PROTOCOL\","
+    echo -n "\"$(output_source_address_prefix)\","
+    echo -n "\"$(output_source_port_ranges)\","
+    echo -n "\"$(output_destination_address_prefix)\","
+    echo -n "\"$(output_destination_port_ranges)\","
+    echo -n "\"$(output_notes)\""
+    echo ""  # Newline at the end
+}
+
 # Function to output Security Rule firewall rule in text format
-function output_SECURITY_RULE_firewall_rule_text() {
-	echo "Subscription Name: $SUBSCRIPTION_NAME";
-	echo "Resource Group Name: $RESOURCE_GROUP_NAME";
-	echo "Resource Group Application Code: $RESOURCE_GROUP_APPLICATION_CODE";
-	echo "Resource Group Department Charge Code: $RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE";
-	echo "Resource Group PAR: $RESOURCE_GROUP_PAR";
-	echo "Resource Group Requestor AD ID: $RESOURCE_GROUP_REQUESTOR_AD_ID";
-	echo "Resource Group Requestor Employee ID: $RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID";
-	echo "Security Rule Name: $SECURITY_RULE_NAME";
-	echo "Security Rule Environment: $SECURITY_RULE_ENVIRONMENT";
-	echo "Security Rule Application Code: $SECURITY_RULE_APPLICATION_CODE";
-	echo "Security Rule Application Name: $SECURITY_RULE_APPLICATION_NAME";
-	echo "Security Rule Requestor AD ID: $SECURITY_RULE_REQUESTOR_AD_ID";
-	echo "Security Rule Employee ID: $SECURITY_RULE_REQUESTOR_EMPLOYEE_ID";
-	echo "Security Rule Domain Name: $SECURITY_RULE_DOMAIN_NAME";
-	echo "Security Rule Type: $SECURITY_RULE_TYPE";
-	echo "Security Rule Allows Public Network Access: $SECURITY_RULE_PUBLIC_NETWORK_ACCESS";
-	echo "Security Rule Allow Outbound Access: $SECURITY_RULE_RESTRICT_OUTBOUND_ACCESS";
-	echo "Security Rule Login: $SECURITY_RULE_ADMIN_LOGIN";
-	echo "Security Rule Admin Type: $SECURITY_RULE_ADMIN_TYPE";
-	echo "Security Rule Admin Principle Type: $SECURITY_RULE_ADMIN_PRINCIPLE_TYPE";
-	echo "Security Rule Admin Principle Login: $SECURITY_RULE_ADMIN_PRINCIPLE_LOGIN";
-	echo "Security Rule Admin Requires Azure Login: $SECURITY_RULE_ADMIN_AZURE_LOGIN_ENABLED_FLAG";
-	echo "Security Rule TLS Version: $SECURITY_RULE_TLS_VERSION";
-	echo "Security Rule Location: $SECURITY_RULE_LOCATION";
-	echo "Security Rule Version: $SECURITY_RULE_VERSION";
-	echo "Firewall Rule Name: $FIREWALL_RULE_NAME";
-	echo "Firewall Rule Start IP Address: $FIREWALL_RULE_START_IP_ADDRESS";
-	echo "Firewall Rule End IP Address: $FIREWALL_RULE_END_IP_ADDRESS";
-	echo "Firewall Rule Resource Group: $FIREWALL_RULE_RESOURCE_GROUP";
-	echo $BLANK_LINE;
-};
+function output_security_rule_text() {
+    cat <<EOF
+Subscription Name: $SUBSCRIPTION_NAME
+Resource Group Name: $RESOURCE_GROUP_NAME
+Resource Group Application Code: $RESOURCE_GROUP_APPLICATION_CODE
+Resource Group Department Charge Code: $RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE
+Resource Group PAR: $RESOURCE_GROUP_PAR
+Resource Group Requestor AD ID: $RESOURCE_GROUP_REQUESTOR_AD_ID
+Resource Group Requestor Employee ID: $RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID
+Network Security Group Name: $NETWORK_SECURITY_GROUP_NAME
+Network Security Group Location: $NETWORK_SECURITY_GROUP_LOCATION
+Violation: $SECURITY_RULE_VIOLATION
+Open From Internet Violation: $SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION
+RDP Violation: $SECURITY_RULE_RDP_VIOLATION
+SSH Violation: $SECURITY_RULE_SSH_VIOLATION
+Security Rule:
+    Name: $SECURITY_RULE_NAME
+    Description: $SECURITY_RULE_DESCRIPTION
+    Access Control: $SECURITY_RULE_ACCESS_CONTROL
+    Direction: $SECURITY_RULE_DIRECTION
+    Protocol: $SECURITY_RULE_PROTOCOL
+    $(output_source_address_prefix)
+    $(output_source_port_ranges)
+    $(output_destination_address_prefix)
+    $(output_destination_port_ranges)
+    $(output_notes)
+    $BLANK_LINE
+EOF
+}
 
 # Function to parse subscription information
 function parse_subscription() {
-	local l_SUBSCRIPTION=$1;
-	SUBSCRIPTION_NAME=$(echo $l_SUBSCRIPTION | jq -rc '.displayName');
-};
+    local l_SUBSCRIPTION=$1
+    SUBSCRIPTION_NAME=$(jq -r '.displayName // empty' <<< "$l_SUBSCRIPTION")
+}
 
 # Function to parse resource group information
 function parse_resource_group() {
@@ -109,47 +193,61 @@ function parse_network_security_group() {
 function parse_security_rule() {
     local l_SECURITY_RULE=$1;
     
-    # Parse Security Rule information from JSON
-    SECURITY_RULE_NAME=$(jq -r '.name' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_ACCESS_CONTROL=$(jq -r '.access' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_APPLICATION_CODE=$(jq -r '.destinationAddressPrefix' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_APPLICATION_NAME=$(jq -r '.destinationAddressPrefixes' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_REQUESTOR_AD_ID=$(jq -r '.destinationPortRange' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_REQUESTOR_EMPLOYEE_ID=$(jq -r '.destinationPortRanges' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_ADMIN_LOGIN=$(jq -r '.direction' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_ADMIN_TYPE=$(jq -r '.name' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_ADMIN_PRINCIPLE_TYPE=$(jq -r '.protocol' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_ADMIN_PRINCIPLE_LOGIN=$(jq -r '.resourceGroup' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_ADMIN_AZURE_LOGIN_ENABLED_FLAG=$(jq -r '.sourceAddressPrefix' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_DOMAIN_NAME=$(jq -r '.sourceAddressPrefixes' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_LOCATION=$(jq -r '.sourcePortRange' <<< "$l_SECURITY_RULE");
-    SECURITY_RULE_TLS_VERSION=$(jq -r '.sourcePortRanges' <<< "$l_SECURITY_RULE");
+	# Parse Security Rule information from JSON
+	SECURITY_RULE_NAME=$(jq -r '.name // empty' <<< "$l_SECURITY_RULE");
+	SECURITY_RULE_DESCRIPTION=$(jq -r '.description // empty' <<< "$l_SECURITY_RULE");
+	SECURITY_RULE_ACCESS_CONTROL=$(jq -r '.access // empty' <<< "$l_SECURITY_RULE");
+	SECURITY_RULE_DESTINATION_ADDRESS_PREFIX=$(jq -r '.destinationAddressPrefix // empty' <<< "$l_SECURITY_RULE");
+	SECURITY_RULE_DESTINATION_ADDRESS_PREFIXES=$(jq -r '.destinationAddressPrefixes | join(", ") // empty' <<< "$l_SECURITY_RULE")
+	SECURITY_RULE_DESTINATION_PORT_RANGE=$(jq -r '.destinationPortRange // empty' <<< "$l_SECURITY_RULE");
+	SECURITY_RULE_DESTINATION_PORT_RANGES=$(jq -r '.destinationPortRanges | join(", ") // empty' <<< "$l_SECURITY_RULE")
+	SECURITY_RULE_DIRECTION=$(jq -r '.direction // empty' <<< "$l_SECURITY_RULE");
+	SECURITY_RULE_PROTOCOL=$(jq -r '.protocol // empty' <<< "$l_SECURITY_RULE");
+	SECURITY_RULE_SOURCE_ADDRESS_PREFIX=$(jq -r '.sourceAddressPrefix // empty' <<< "$l_SECURITY_RULE");
+	SECURITY_RULE_SOURCE_ADDRESS_PREFIXES=$(jq -r '.sourceAddressPrefixes | join(", ") // empty' <<< "$l_SECURITY_RULE")
+	SECURITY_RULE_SOURCE_PORT_RANGE=$(jq -r '.sourcePortRange // empty' <<< "$l_SECURITY_RULE");
+	SECURITY_RULE_SOURCE_PORT_RANGES=$(jq -r '.sourcePortRanges | join(", ") // empty' <<< "$l_SECURITY_RULE")
 
-    # Determine flags for public network access and outbound access violation
-    SECURITY_RULE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="False";
-    if [[ $SECURITY_RULE_PUBLIC_NETWORK_ACCESS == "Enabled" ]]; then
-        SECURITY_RULE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="True";
-    fi;
-}
+	SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION="False"
+	if [[ "$SECURITY_RULE_ACCESS_CONTROL" == "Allow" ]]; then
+		if [[ "$SECURITY_RULE_DIRECTION" == "Inbound" ]]; then
+			if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "*" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "0.0.0.0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "<nw>/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "internet" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "any" ]]; then
+				SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION="True"
+			fi
+		fi
+	fi
 
-# Function to parse SQL server firewall rule information
-function parse_sql_server_firewall_rule() {
-    local l_FIREWALL_RULE=$1
+	SECURITY_RULE_RDP_VIOLATION="False"
+	if [[ "$SECURITY_RULE_ACCESS_CONTROL" == "Allow" ]]; then
+		if [[ "$SECURITY_RULE_DIRECTION" == "Inbound" ]]; then
+			if [[ "$SECURITY_RULE_PROTOCOL" == "TCP" || "$SECURITY_RULE_PROTOCOL" == "*" ]]; then
+				if [[ "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "3389" || "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "*" || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *3389* ]]; then
+					if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "*" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "0.0.0.0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "<nw>/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "internet" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "any" ]]; then
+						SECURITY_RULE_RDP_VIOLATION="True"
+					fi
+				fi
+			fi
+		fi
+	fi
 
-    # Parse SQL server firewall rule information from JSON
-    FIREWALL_RULE_NAME=$(jq -rc '.name' <<< "$l_FIREWALL_RULE")
-    FIREWALL_RULE_START_IP_ADDRESS=$(jq -rc '.startIpAddress' <<< "$l_FIREWALL_RULE")
-    FIREWALL_RULE_END_IP_ADDRESS=$(jq -rc '.endIpAddress' <<< "$l_FIREWALL_RULE")
-    FIREWALL_RULE_RESOURCE_GROUP=$(jq -rc '.resourceGroup' <<< "$l_FIREWALL_RULE")
+	SECURITY_RULE_SSH_VIOLATION="False"
+	if [[ "$SECURITY_RULE_ACCESS_CONTROL" == "Allow" ]]; then
+		if [[ "$SECURITY_RULE_DIRECTION" == "Inbound" ]]; then
+			if [[ "$SECURITY_RULE_PROTOCOL" == "TCP" || "$SECURITY_RULE_PROTOCOL" == "*" ]]; then
+				if [[ "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "22" || "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "*" || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *22* ]]; then
+					if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "*" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "0.0.0.0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "<nw>/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "internet" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "any" ]]; then
+						SECURITY_RULE_SSH_VIOLATION="True"
+					fi
+				fi
+			fi
+		fi
+	fi
 
-    # Determine flags for firewall rule violation
-    FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG="False"
-    [[ $FIREWALL_RULE_NAME == "AllowAllWindowsAzureIps" ]] && FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG="True"
-
-    FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG="False"
-    if ! [[ $FIREWALL_RULE_START_IP_ADDRESS =~ ^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|127\.) ]]; then
-        FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG="True"
+	SECURITY_RULE_VIOLATION="False"
+	if [[ "$SECURITY_RULE_RDP_VIOLATION" == "True" || "$SECURITY_RULE_SSH_VIOLATION" == "True" || "$SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION" == "True" ]]; then
+        SECURITY_RULE_VIOLATION="True"
     fi
+
 }
 
 # Include common menu
@@ -158,13 +256,14 @@ source ./common-menu.inc;
 # Get subscriptions
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
 
-# Debugging information
-if [[ $DEBUG == "True" ]]; then
-	echo "Subscriptions (JSON): $SUBSCRIPTIONS";
-fi;
-
 # Check if subscriptions exist
 if [[ $SUBSCRIPTIONS != "[]" ]]; then
+
+	# Debugging information
+	if [[ $DEBUG == "True" ]]; then
+		echo "Subscriptions (JSON): $SUBSCRIPTIONS";
+	fi;
+
 	output_header;
 		
 	echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION;do
@@ -181,6 +280,7 @@ if [[ $SUBSCRIPTIONS != "[]" ]]; then
 
 		# Process each resource group
 		if [[ $RESOURCE_GROUPS != "[]" ]]; then
+
 			echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP;do
 
 				# Parse resource group information
@@ -205,40 +305,22 @@ if [[ $SUBSCRIPTIONS != "[]" ]]; then
 						# Parse Security Rule information
 						parse_network_security_group "$NETWORK_SECURITY_GROUP";
 
-    echo $NETWORK_SECURITY_GROUP_NAME
-	echo $NETWORK_SECURITY_GROUP_LOCATION
-	echo $NETWORK_SECURITY_GROUP_SECURITY_RULES
-	exit 1;
 						# Process each Security Rule
-						if [[ $SECURITY_RULES != "[]" ]]; then
+						if [[ $NETWORK_SECURITY_GROUP_SECURITY_RULES != "[]" ]]; then
+
 							if [[ $DEBUG == "True" && $CSV == "False" ]]; then
-								echo "Security Rules (JSON): $SECURITY_RULES";
+								echo "Security Rules (JSON): $NETWORK_SECURITY_GROUP_SECURITY_RULES";
 							fi;
 
-							echo $SECURITY_RULES | jq -rc '.[].[]' | while IFS='' read SECURITY_RULE;do
+							echo $NETWORK_SECURITY_GROUP_SECURITY_RULES | jq -rc '.[]' | while IFS='' read SECURITY_RULE;do
+								
+								if [[ $DEBUG == "True" && $CSV == "False" ]]; then
+									echo "Security Rule (JSON): $SECURITY_RULE";
+								fi;
+
 								# Parse Security Rule information
 								parse_security_rule "$SECURITY_RULE";
-
-								# Get firewall rules for the Security Rule
-								declare SECURITY_RULE_FIREWALL_RULES=$(get_azure_SECURITY_RULE_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$SECURITY_RULE_NAME");
-
-								if [[ $SECURITY_RULE_FIREWALL_RULES != "[]" ]]; then
-									echo $SECURITY_RULE_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE;do
-										# Parse firewall rule information
-										parse_security_rule_firewall_rule "$FIREWALL_RULE";
-
-										# Output Security Rule firewall rule if it does not violate conditions
-										if [[ ! $FIREWALL_RULE_NAME =~ ^ClientIPAddress ]]; then
-											output_SECURITY_RULE_firewall_rule;
-										fi;
-									done;
-								else
-									# Print message if no firewall rules found
-									if [[ $CSV == "False" ]]; then
-										echo "No Security Rule firewall rules found";
-										echo $BLANK_LINE;
-									fi;
-								fi;
+								output_security_rule;						
 							done;
 						else
 							# Print message if no Security Rules found
