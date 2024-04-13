@@ -287,8 +287,6 @@ function parse_security_rule() {
 	fi
 }
 
-#!/bin/bash
-
 # Include common menu
 source ./common-menu.inc;
 
