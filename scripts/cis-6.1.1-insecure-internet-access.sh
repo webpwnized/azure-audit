@@ -287,6 +287,8 @@ function parse_security_rule() {
 	fi
 }
 
+#!/bin/bash
+
 # Include common menu
 source ./common-menu.inc;
 
@@ -294,99 +296,101 @@ source ./common-menu.inc;
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
 
 # Check if subscriptions exist
-if [[ $SUBSCRIPTIONS != "[]" ]]; then
+if [[ $SUBSCRIPTIONS == "[]" ]]; then
+    # Print message if no subscriptions found
+    if [[ $CSV == "False" ]]; then
+        echo "No subscriptions found";
+        echo $BLANK_LINE;
+    fi;
+    exit 0
+fi
 
-	# Debugging information
-	if [[ $DEBUG == "True" ]]; then
-		echo "Subscriptions (JSON): $SUBSCRIPTIONS";
-	fi;
-
-	output_header;
-		
-	echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION;do
-
-		# Parse subscription information
-		parse_subscription "$SUBSCRIPTION";
-		
-		# Get resource groups for the subscription
-		declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME");
-
-		if [[ $DEBUG == "True" && $CSV == "False" ]]; then
-			echo "Resources Groups (JSON): $RESOURCE_GROUPS";
-		fi;
-
-		# Process each resource group
-		if [[ $RESOURCE_GROUPS != "[]" ]]; then
-
-			echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP;do
-
-				# Parse resource group information
-				parse_resource_group "$RESOURCE_GROUP";
-
-				# Get Security Rules for the resource group
-				declare NETWORK_SECURITY_GROUPS=$(get_network_security_groups "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME");
-
-				# Process each Network Security Group
-				if [[ $NETWORK_SECURITY_GROUPS != "[]" ]]; then
-
-					if [[ $DEBUG == "True" && $CSV == "False" ]]; then
-						echo "Network Security Groups (JSON): $NETWORK_SECURITY_GROUPS";
-					fi;
-
-					echo $NETWORK_SECURITY_GROUPS | jq -rc '.[]' | while IFS='' read NETWORK_SECURITY_GROUP;do
-						
-						if [[ $DEBUG == "True" && $CSV == "False" ]]; then
-							echo "Network Security Group (JSON): $NETWORK_SECURITY_GROUP";
-						fi;
-						
-						# Parse Security Rule information
-						parse_network_security_group "$NETWORK_SECURITY_GROUP";
-
-						# Process each Security Rule
-						if [[ $NETWORK_SECURITY_GROUP_SECURITY_RULES != "[]" ]]; then
-
-							if [[ $DEBUG == "True" && $CSV == "False" ]]; then
-								echo "Security Rules (JSON): $NETWORK_SECURITY_GROUP_SECURITY_RULES";
-							fi;
-
-							echo $NETWORK_SECURITY_GROUP_SECURITY_RULES | jq -rc '.[]' | while IFS='' read SECURITY_RULE;do
-								
-								if [[ $DEBUG == "True" && $CSV == "False" ]]; then
-									echo "Security Rule (JSON): $SECURITY_RULE";
-								fi;
-
-								# Parse Security Rule information
-								parse_security_rule "$SECURITY_RULE";
-								output_security_rule;						
-							done;
-						else
-							# Print message if no Security Rules found
-							if [[ $CSV == "False" ]]; then
-								echo "No Security Rules found";
-								echo $BLANK_LINE;
-							fi;
-						fi;
-					done;
-				else
-					# Print message if no Security Rules found
-					if [[ $CSV == "False" ]]; then
-						echo "No Network Security Groups found";
-						echo $BLANK_LINE;
-					fi;
-				fi;
-			done;
-		else
-			# Print message if no resource groups found
-			if [[ $CSV == "False" ]]; then
-				echo "No resource groups found";
-				echo $BLANK_LINE;
-			fi;
-		fi;
-	done;
-else
-	# Print message if no subscriptions found
-	if [[ $CSV == "False" ]]; then
-		echo "No subscriptions found";
-		echo $BLANK_LINE;
-	fi;
+# Debugging information
+if [[ $DEBUG == "True" ]]; then
+    echo "Subscriptions (JSON): $SUBSCRIPTIONS";
 fi;
+
+output_header;
+
+# Process each subscription
+echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
+    # Parse subscription information
+    parse_subscription "$SUBSCRIPTION";
+
+    # Skip Visual Studio subscriptions
+    if [[ "$SUBSCRIPTION_NAME" == "Visual Studio"* ]]; then
+        continue
+    fi
+
+    # Get resource groups for the subscription
+    declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME");
+
+    if [[ $DEBUG == "True" ]]; then
+        echo "Resources Groups (JSON): $RESOURCE_GROUPS";
+    fi;
+
+    # Process each resource group
+    if [[ $RESOURCE_GROUPS == "[]" ]]; then
+        # Print message if no resource groups found
+        if [[ $CSV == "False" ]]; then
+            echo "No resource groups found";
+            echo $BLANK_LINE;
+        fi;
+        continue
+    fi
+
+    echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
+        # Parse resource group information
+        parse_resource_group "$RESOURCE_GROUP";
+
+        # Get Security Rules for the resource group
+        declare NETWORK_SECURITY_GROUPS=$(get_network_security_groups "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME");
+
+        # Process each Network Security Group
+        if [[ $NETWORK_SECURITY_GROUPS == "[]" ]]; then
+            # Print message if no Network Security Groups found
+            if [[ $CSV == "False" ]]; then
+                echo "No Network Security Groups found";
+                echo $BLANK_LINE;
+            fi;
+            continue
+        fi
+
+        if [[ $DEBUG == "True" && $CSV == "False" ]]; then
+            echo "Network Security Groups (JSON): $NETWORK_SECURITY_GROUPS";
+        fi;
+
+        echo $NETWORK_SECURITY_GROUPS | jq -rc '.[]' | while IFS='' read NETWORK_SECURITY_GROUP; do
+            if [[ $DEBUG == "True" && $CSV == "False" ]]; then
+                echo "Network Security Group (JSON): $NETWORK_SECURITY_GROUP";
+            fi;
+
+            # Parse Security Rule information
+            parse_network_security_group "$NETWORK_SECURITY_GROUP";
+
+            # Process each Security Rule
+            if [[ $NETWORK_SECURITY_GROUP_SECURITY_RULES == "[]" ]]; then
+                # Print message if no Security Rules found
+                if [[ $CSV == "False" ]]; then
+                    echo "No Security Rules found";
+                    echo $BLANK_LINE;
+                fi;
+                continue
+            fi
+
+            if [[ $DEBUG == "True" && $CSV == "False" ]]; then
+                echo "Security Rules (JSON): $NETWORK_SECURITY_GROUP_SECURITY_RULES";
+            fi;
+
+            echo $NETWORK_SECURITY_GROUP_SECURITY_RULES | jq -rc '.[]' | while IFS='' read SECURITY_RULE; do
+                if [[ $DEBUG == "True" && $CSV == "False" ]]; then
+                    echo "Security Rule (JSON): $SECURITY_RULE";
+                fi;
+
+                # Parse Security Rule information
+                parse_security_rule "$SECURITY_RULE";
+                output_security_rule;
+            done;
+        done;
+    done;
+done;
