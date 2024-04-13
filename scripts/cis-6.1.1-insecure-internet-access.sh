@@ -193,6 +193,23 @@ function parse_network_security_group() {
     NETWORK_SECURITY_GROUP_SECURITY_RULES=$(jq -rc '.securityRules // empty' <<< "$l_NETWORK_SECURITY_GROUP");
 }
 
+# Function to check if traffic is allowed from the internet
+function is_traffic_allowed_from_internet() {
+    [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" =~ ^(?!10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.).*$ || 
+       "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "*" || 
+       "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "0.0.0.0" || 
+       "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "<nw>/0" || 
+       "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "/0" || 
+       "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Internet" || 
+       "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Any" ]]
+}
+
+# Function to check if the security rule matches a specific protocol and destination port
+function is_port_and_protocol_matched() {
+    [[ "$SECURITY_RULE_PROTOCOL" == "$1" || "$SECURITY_RULE_PROTOCOL" == "*" ]] && 
+    [[ "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "$2" || "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "*" || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *"$2"* ]]
+}
+
 # Function to parse Security Rule information
 function parse_security_rule() {
     local l_SECURITY_RULE=$1;
@@ -212,69 +229,51 @@ function parse_security_rule() {
 	SECURITY_RULE_SOURCE_PORT_RANGE=$(jq -r '.sourcePortRange // empty' <<< "$l_SECURITY_RULE");
 	SECURITY_RULE_SOURCE_PORT_RANGES=$(jq -r '.sourcePortRanges | join(", ") // empty' <<< "$l_SECURITY_RULE")
 
+	# Initialize variables
 	SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION="False"
+	SECURITY_RULE_RDP_VIOLATION="False"
+	SECURITY_RULE_SSH_VIOLATION="False"
+	SECURITY_RULE_UDP_VIOLATION="False"
+	SECURITY_RULE_HTTP_VIOLATION="False"
+
+	# Check for each violation
 	if [[ "$SECURITY_RULE_ACCESS_CONTROL" == "Allow" ]]; then
 		if [[ "$SECURITY_RULE_DIRECTION" == "Inbound" ]]; then
-			if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "*" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "0.0.0.0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "<nw>/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Internet" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Any" ]]; then
+			if is_traffic_allowed_from_internet; then
 				SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION="True"
 			fi
-		fi
-	fi
 
-	SECURITY_RULE_RDP_VIOLATION="False"
-	if [[ "$SECURITY_RULE_ACCESS_CONTROL" == "Allow" ]]; then
-		if [[ "$SECURITY_RULE_DIRECTION" == "Inbound" ]]; then
-			if [[ "$SECURITY_RULE_PROTOCOL" == "TCP" || "$SECURITY_RULE_PROTOCOL" == "*" ]]; then
-				if [[ "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "3389" || "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "*" || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *3389* ]]; then
-					if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "*" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "0.0.0.0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "<nw>/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Internet" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Any" ]]; then
-						SECURITY_RULE_RDP_VIOLATION="True"
-					fi
-				fi
+			if is_port_and_protocol_matched "TCP" "3389"; then
+				SECURITY_RULE_RDP_VIOLATION="True"
+			fi
+
+			if is_port_and_protocol_matched "TCP" "22"; then
+				SECURITY_RULE_SSH_VIOLATION="True"
+			fi
+
+			if is_port_and_protocol_matched "UDP" "53" || 
+			is_port_and_protocol_matched "UDP" "123" || 
+			is_port_and_protocol_matched "UDP" "161" || 
+			is_port_and_protocol_matched "UDP" "389" || 
+			is_port_and_protocol_matched "UDP" "1900"; then
+				SECURITY_RULE_UDP_VIOLATION="True"
+			fi
+
+			if is_port_and_protocol_matched "TCP" "80" || is_port_and_protocol_matched "TCP" "443"; then
+				SECURITY_RULE_HTTP_VIOLATION="True"
 			fi
 		fi
 	fi
 
-	SECURITY_RULE_SSH_VIOLATION="False"
-	if [[ "$SECURITY_RULE_ACCESS_CONTROL" == "Allow" ]]; then
-		if [[ "$SECURITY_RULE_DIRECTION" == "Inbound" ]]; then
-			if [[ "$SECURITY_RULE_PROTOCOL" == "TCP" || "$SECURITY_RULE_PROTOCOL" == "*" ]]; then
-				if [[ "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "22" || "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "*" || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *22* ]]; then
-					if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "*" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "0.0.0.0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "<nw>/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Internet" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Any" ]]; then
-						SECURITY_RULE_SSH_VIOLATION="True"
-					fi
-				fi
-			fi
-		fi
-	fi
-
-	SECURITY_RULE_UDP_VIOLATION="False"
-	if [[ "$SECURITY_RULE_ACCESS_CONTROL" == "Allow" ]]; then
-		if [[ "$SECURITY_RULE_DIRECTION" == "Inbound" ]]; then
-			if [[ "$SECURITY_RULE_PROTOCOL" == "UDP" || "$SECURITY_RULE_PROTOCOL" == "*" ]]; then
-				if [[ "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "*" || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *53* || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *123* || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *161* || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *389* || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *1900* ]]; then
-					if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "*" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "0.0.0.0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "<nw>/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Internet" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Any" ]]; then
-						SECURITY_RULE_UDP_VIOLATION="True"
-					fi
-				fi
-			fi
-		fi
-	fi
-
-	SECURITY_RULE_HTTP_VIOLATION="False"
-	if [[ "$SECURITY_RULE_ACCESS_CONTROL" == "Allow" ]]; then
-		if [[ "$SECURITY_RULE_DIRECTION" == "Inbound" ]]; then
-			if [[ "$SECURITY_RULE_PROTOCOL" == "TCP" || "$SECURITY_RULE_PROTOCOL" == "*" ]]; then
-				if [[ "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "80" || "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "443" || "$SECURITY_RULE_DESTINATION_PORT_RANGE" == "*" || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *80* || "$SECURITY_RULE_DESTINATION_PORT_RANGES" == *443* ]]; then
-					if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "*" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "0.0.0.0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "<nw>/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "/0" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Internet" || "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "Any" ]]; then
-						SECURITY_RULE_HTTP_VIOLATION="True"
-					fi
-				fi
-			fi
-		fi
-	fi
-
+	# Initialize SECURITY_RULE_VIOLATION as False
 	SECURITY_RULE_VIOLATION="False"
-	if [[ "$SECURITY_RULE_RDP_VIOLATION" == "True" || "$SECURITY_RULE_SSH_VIOLATION" == "True" || "$SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION" == "True" || "$SECURITY_RULE_UDP_VIOLATION" == "True" || "$SECURITY_RULE_HTTP_VIOLATION" == "True" ]]; then
+
+	# Check if any violation is True
+	if [[ "$SECURITY_RULE_RDP_VIOLATION" == "True" || 
+		"$SECURITY_RULE_SSH_VIOLATION" == "True" || 
+		"$SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION" == "True" || 
+		"$SECURITY_RULE_UDP_VIOLATION" == "True" || 
+		"$SECURITY_RULE_HTTP_VIOLATION" == "True" ]]; then
 		SECURITY_RULE_VIOLATION="True"
 	fi
 }
