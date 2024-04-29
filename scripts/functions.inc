@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Output debug information
+function output_debug_info() {
+    # Check if debug mode is enabled
+    if [[ $DEBUG == "True" ]]; then
+        echo "$1"
+    fi
+}
+
 # Function to get subscriptions
 function get_subscriptions() {
     local l_SUBSCRIPTION_ID="$1"
