@@ -120,9 +120,7 @@ source ./common-menu.inc
 SUBSCRIPTIONS=$(get_subscriptions $p_SUBSCRIPTION_ID)
 
 # Debugging information
-if [[ $DEBUG == "True" ]]; then
-    echo "Subscriptions (JSON): $SUBSCRIPTIONS"
-fi
+output_debug_info "Subscriptions (JSON): $SUBSCRIPTIONS"
 
 # Check if subscriptions exist
 if [[ $SUBSCRIPTIONS != "[]" ]]; then
@@ -137,13 +135,14 @@ if [[ $SUBSCRIPTIONS != "[]" ]]; then
         # Get resource groups for the subscription
         declare RESOURCE_GROUPS=$(get_resource_groups $SUBSCRIPTION_NAME $p_RESOURCE_GROUP_NAME)
 
-        if [[ $DEBUG == "True" ]]; then
-            echo "Resources Groups (JSON): $RESOURCE_GROUPS"
-        fi
+        output_debug_info "Resources Groups (JSON): $RESOURCE_GROUPS"
 
         # Process each resource group
         if [[ $RESOURCE_GROUPS != "[]" ]]; then
             echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
+
+                output_debug_info "Resources Group (JSON): $RESOURCE_GROUP"
+
                 # Parse resource group information
                 parse_resource_group
                 
