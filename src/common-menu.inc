@@ -4,13 +4,38 @@
 declare p_SUBSCRIPTION="";
 declare p_RESOURCE_GROUP="";
 
-# Declare variables for debug and csv flags
+# Declare variables for debug, csv, and check connectivity flags
 declare DEBUG="False";
 declare CSV="False";
+declare CHECK_CONNECTIVITY="False";
 
 # Declare a variable for help message
 declare HELP=$(cat << EOL
-    $0 [-c, --csv] [-d, --debug] [-h, --help] [-s <SUBSCRIPTION_ID>, --subscription <SUBSCRIPTION_ID> ] [-r <RESOURCE_GROUP_NAME>, --resource-group <RESOURCE_GROUP_NAME>]
+Usage: $0 [OPTIONS]
+
+Options:
+  -h, --help                       Show this help message and exit.
+  -d, --debug                      Enable debug mode. Provides detailed output for troubleshooting.
+  -c, --csv                        Output results in CSV format.
+  -k, --check-connectivity         Check connectivity to Azure resource. This option is only applicable for certain types of resources like databases.
+  -s <SUBSCRIPTION_ID>, --subscription <SUBSCRIPTION_ID>
+                                   Specify the Azure subscription ID to use.
+  -r <RESOURCE_GROUP_NAME>, --resource-group <RESOURCE_GROUP_NAME>
+                                   Specify the Azure resource group name.
+
+Examples:
+  $0 -s your-subscription-id -r your-resource-group
+      Perform checks on the specified subscription and resource group.
+  $0 --debug --csv
+      Enable debug mode and output results in CSV format.
+  $0 -k
+      Check connectivity to Azure resources.
+
+Description:
+This script performs various checks on Azure Cloud resource groups. 
+You can specify the Azure subscription and resource group to target, 
+enable debug mode for more detailed output, and output results in CSV 
+format.
 EOL
 );
 
@@ -19,17 +44,18 @@ for arg in "$@"; do
   shift
   # Match argument to its short form
   case "$arg" in
-    "--help") 			set -- "$@" "-h" ;;
-    "--debug") 			set -- "$@" "-d" ;;
-    "--csv") 			set -- "$@" "-c" ;;
-    "--subscription")		set -- "$@" "-s" ;;
-    "--resource-group") 	set -- "$@" "-r" ;;
-    *)        			set -- "$@" "$arg"
+    "--help")              set -- "$@" "-h" ;;
+    "--debug")             set -- "$@" "-d" ;;
+    "--csv")               set -- "$@" "-c" ;;
+    "--check-connectivity") set -- "$@" "-k" ;;
+    "--subscription")      set -- "$@" "-s" ;;
+    "--resource-group")    set -- "$@" "-r" ;;
+    *)                     set -- "$@" "$arg"
   esac
 done
 
 # Process all short form arguments
-while getopts "hdcs:r:" option
+while getopts "hdkcs:r:" option
 do 
     case "${option}" in
         d)
@@ -40,8 +66,11 @@ do
             CSV="True";;
         h)
             # Print help message and exit
-            echo $HELP; 
+            echo "$HELP"; 
             exit 0;;
+        k)
+            # Set check connectivity flag to true
+            CHECK_CONNECTIVITY="True";;
         s)
             # Set subscription id
             p_SUBSCRIPTION_ID="${OPTARG}";;
@@ -50,3 +79,4 @@ do
             p_RESOURCE_GROUP_NAME="${OPTARG}";;
     esac;
 done;
+

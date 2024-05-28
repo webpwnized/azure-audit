@@ -3,8 +3,9 @@
 # Output debug information
 function output_debug_info() {
     # Check if debug mode is enabled
-    if [[ $DEBUG == "True" ]]; then
+    if [[ $DEBUG == "True" && $CSV == "False" ]]; then
         echo "$1"
+        echo $BLANK_LINE
     fi
 }
 
@@ -24,6 +25,13 @@ function get_subscriptions() {
     echo "$l_RESULTS"
 }
 
+# Function to parse subscription information
+function parse_subscription() {
+    local l_SUBSCRIPTION=$1
+    SUBSCRIPTION_NAME=$(jq -rc '.displayName // ""' <<< "$l_SUBSCRIPTION")
+    SUBSCRIPTION_ID=$(jq -rc '.subscriptionId // ""' <<< "$l_SUBSCRIPTION")
+}
+
 # Function to get resource groups
 function get_resource_groups() {
     local l_SUBSCRIPTION_ID="$1"
@@ -39,6 +47,19 @@ function get_resource_groups() {
     fi
 
     echo "$l_RESULTS"
+}
+
+# Function to parse resource group information
+function parse_resource_group() {
+    local l_RESOURCE_GROUP=$1
+
+    # Parse resource group information from JSON
+    RESOURCE_GROUP_NAME=$(jq -r '.name' <<< "$l_RESOURCE_GROUP")
+    RESOURCE_GROUP_APPLICATION_CODE=$(jq -r '.tags.applicationCode // ""' <<< "$l_RESOURCE_GROUP")
+    RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE=$(jq -r '.tags.departmentChargeCode // ""' <<< "$l_RESOURCE_GROUP")
+    RESOURCE_GROUP_PAR=$(jq -r '.tags.par // ""' <<< "$l_RESOURCE_GROUP")
+    RESOURCE_GROUP_REQUESTOR_AD_ID=$(jq -r '.tags.requestorAdId // ""' <<< "$l_RESOURCE_GROUP")
+    RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID=$(jq -r '.tags.requestorEmployeeId // ""' <<< "$l_RESOURCE_GROUP")
 }
 
 # Function to get Network Security Groups
