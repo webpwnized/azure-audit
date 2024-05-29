@@ -78,141 +78,82 @@ function output_sql_server_firewall_rule_text() {
     echo $BLANK_LINE
 }
 
-# Function to parse SQL server information
-function parse_sql_server() {
-    local l_SQL_SERVER=$1
-    
-    # Parse SQL server information from JSON
-    SQL_SERVER_NAME=$(jq -rc '.name // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_ENVIRONMENT=$(jq -rc '.tags.Environment // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_APPLICATION_CODE=$(jq -rc '.tags.applicationCode // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_APPLICATION_NAME=$(jq -rc '.tags.applicationName // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_REQUESTOR_AD_ID=$(jq -rc '.tags.requestorADID // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_REQUESTOR_EMPLOYEE_ID=$(jq -rc '.tags.requestorEmployeeID // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_ADMIN_LOGIN=$(jq -rc '.administratorLogin // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_ADMIN_TYPE=$(jq -rc '.administrators.administratorType // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_ADMIN_PRINCIPLE_TYPE=$(jq -rc '.administrators.principalType // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_ADMIN_PRINCIPLE_LOGIN=$(jq -rc '.administrators.login // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_ADMIN_AZURE_LOGIN_ENABLED_FLAG=$(jq -rc '.administrators.azureAdOnlyAuthentication // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_DOMAIN_NAME=$(jq -rc '.fullyQualifiedDomainName // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_LOCATION=$(jq -rc '.location // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_TLS_VERSION=$(jq -rc '.minimalTlsVersion // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_PUBLIC_NETWORK_ACCESS=$(jq -rc '.publicNetworkAccess // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_RESTRICT_OUTBOUND_ACCESS=$(jq -rc '.restrictOutboundNetworkAccess // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_TYPE=$(jq -rc '.type // ""' <<< "$l_SQL_SERVER")
-    SQL_SERVER_VERSION=$(jq -rc '.version // ""' <<< "$l_SQL_SERVER")
-
-    # Determine flags for public network access and outbound access violation
-    SQL_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="False"
-    [[ $SQL_SERVER_PUBLIC_NETWORK_ACCESS == "Enabled" ]] && SQL_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="True"
-
-    SQL_SERVER_OUTBOUND_NETWORK_ACCESS_VIOLATION_FLAG="False"
-    [[ $SQL_SERVER_RESTRICT_OUTBOUND_ACCESS != "Enable" ]] && SQL_SERVER_OUTBOUND_NETWORK_ACCESS_VIOLATION_FLAG="True"
-
-    SQL_SERVER_SQLCMD_CONNECT=""
-    if [[ $SQL_SERVER_SQLCMD_INSTALLED != "True" ]]; then
-        SQL_SERVER_SQLCMD_CONNECT="Skipped Check: The sqlcmd software is not installed."
-    elif [[ $SQL_SERVER_PUBLIC_NETWORK_ACCESS != "Enabled" ]]; then
-        SQL_SERVER_SQLCMD_CONNECT="Skipped Check: Public network access is not enabled." 
-    elif [[ $CHECK_CONNECTIVITY != "True" ]]; then
-        SQL_SERVER_SQLCMD_CONNECT="Skipped Check: Connectivity check is not enabled by the user optional flag."
-    else 
-        SQL_SERVER_SQLCMD_CONNECT="$(sqlcmd -S $SQL_SERVER_DOMAIN_NAME -U $SQL_SERVER_ADMIN_LOGIN -P 'password')"
-    fi
-
-}
-
-# Function to parse SQL server firewall rule information
-function parse_sql_server_firewall_rule() {
-    local l_FIREWALL_RULE=$1
-
-    # Parse SQL server firewall rule information from JSON
-    FIREWALL_RULE_NAME=$(jq -rc '.name' <<< "$l_FIREWALL_RULE")
-    FIREWALL_RULE_START_IP_ADDRESS=$(jq -rc '.startIpAddress // ""' <<< "$l_FIREWALL_RULE")
-    FIREWALL_RULE_END_IP_ADDRESS=$(jq -rc '.endIpAddress // ""' <<< "$l_FIREWALL_RULE")
-    FIREWALL_RULE_RESOURCE_GROUP=$(jq -rc '.resourceGroup // ""' <<< "$l_FIREWALL_RULE")
-
-    # Determine flags for firewall rule violation
-    FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG="False"
-    [[ $FIREWALL_RULE_NAME == "AllowAllWindowsAzureIps" ]] && FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG="True"
-
-    FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG="False"
-    if ! [[ $FIREWALL_RULE_START_IP_ADDRESS =~ ^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|127\.) ]]; then
-        FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG="True"
-    fi
-}
-
 # Include common menu
 source ./common-menu.inc
 
 # Get subscriptions
-declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID")
-
-# Debugging information
-output_debug_info "Subscriptions (JSON): $SUBSCRIPTIONS"
+declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
+output_debug_info "Subscriptions (JSON): $SUBSCRIPTIONS";
 
 # Check if subscriptions exist
-if [[ $SUBSCRIPTIONS != "[]" ]]; then
-    output_header
+if [[ $SUBSCRIPTIONS == "[]" ]]; then
+    output_user_info "No subscriptions found.";
+    exit 0
+fi
+
+output_header
+
+echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
+
+    output_debug_info "Subscription (JSON): $SUBSCRIPTION"
     
-    echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
+    # Parse subscription information
+    parse_subscription "$SUBSCRIPTION"
+    
+    # Get resource groups for the subscription
+    declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME")
+    output_debug_info "Resources Groups (JSON): $RESOURCE_GROUPS"
 
-        # Parse subscription information
-        parse_subscription "$SUBSCRIPTION"
-        
-        # Get resource groups for the subscription
-        declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME")
+    # Process each resource group
+    if [[ $RESOURCE_GROUPS != "[]" ]]; then
 
-        output_debug_info "Resources Groups (JSON): $RESOURCE_GROUPS"
+        echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
 
-        # Process each resource group
-        if [[ $RESOURCE_GROUPS != "[]" ]]; then
-		
-            echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
+            output_debug_info "Resource Group (JSON): $RESOURCE_GROUP"   
 
-                # Parse resource group information
-                parse_resource_group "$RESOURCE_GROUP"
+            # Parse resource group information
+            parse_resource_group "$RESOURCE_GROUP"
+            
+            # Get SQL servers for the resource group
+            declare SQL_SERVERS=$(get_azure_sql_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
+            output_debug_info "SQL Servers (JSON): $SQL_SERVERS"
 
-                # Get SQL servers for the resource group
-                declare SQL_SERVERS=$(get_azure_sql_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
+            # Process each SQL server
+            if [[ $SQL_SERVERS != "[]" ]]; then
+                echo $SQL_SERVERS | jq -rc '.[]' | while IFS='' read SQL_SERVER; do
+                    output_debug_info "SQL Server (JSON): $SQL_SERVER"
 
-                output_debug_info "SQL Servers (JSON): $SQL_SERVERS"
+                    # Parse SQL server information
+                    parse_azure_sql_server "$SQL_SERVER"
+                    
+                    # Get firewall rules for the SQL server
+                    declare SQL_SERVER_FIREWALL_RULES=$(get_azure_sql_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$SQL_SERVER_NAME")
+                    output_debug_info "SQL Server Firewall Rules (JSON): $SQL_SERVER_FIREWALL_RULES"
 
-                # Process each SQL server
-                if [[ $SQL_SERVERS != "[]" ]]; then
-                    echo $SQL_SERVERS | jq -rc '.[]' | while IFS='' read SQL_SERVER; do
-                        # Parse SQL server information
-                        parse_sql_server "$SQL_SERVER"
+                    if [[ $SQL_SERVER_FIREWALL_RULES != "[]" ]]; then
+                        echo $SQL_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
+                            output_debug_info "SQL Server Firewall Rule (JSON): $FIREWALL_RULE"
+                            
+                            # Parse firewall rule information
+                            parse_azure_sql_server_firewall_rule "$FIREWALL_RULE"
 
-                        # Get firewall rules for the SQL server
-                        declare SQL_SERVER_FIREWALL_RULES=$(get_azure_sql_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$SQL_SERVER_NAME")
-
-                        if [[ $SQL_SERVER_FIREWALL_RULES != "[]" ]]; then
-                            echo $SQL_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
-                                # Parse firewall rule information
-                                parse_sql_server_firewall_rule "$FIREWALL_RULE"
-
-                                # Output SQL server firewall rule if it does not violate conditions
-                                if [[ ! $FIREWALL_RULE_NAME =~ ^ClientIPAddress ]]; then
-                                    output_sql_server_firewall_rule
-                                    fi # End of firewall rule check
-                            done # End of firewall rule processing
-                        else
-                            # Print message if no firewall rules found
-							output_debug_info "No SQL server firewall rules found"
-                        fi # End of firewall rule processing
-                    done # End of SQL server processing
-                else
-                    # Print message if no SQL servers found
-                    output_debug_info "No SQL servers found"
-                fi # End of SQL server processing
-            done # End of resource group processing
-        else
-            # Print message if no resource groups found
-			output_debug_info "No resource groups found"
-        fi # End of resource group processing
-    done # End of subscription processing
-else
-    # Print message if no subscriptions found
-    output_debug_info "No subscriptions found"
-fi # End of subscription check 
+                            # Output SQL server firewall rule if it does not violate conditions
+                            #if [[ ! $FIREWALL_RULE_NAME =~ ^ClientIPAddress ]]; then
+                                output_sql_server_firewall_rule
+                            #fi # End of firewall rule check
+                        done # End of firewall rule processing
+                    else
+                        # Print message if no firewall rules found
+                        output_user_info "No SQL server firewall rules found"
+                    fi # End of firewall rule processing
+                done # End of SQL server processing
+            else
+                # Print message if no SQL servers found
+                output_user_info "No SQL servers found"
+            fi # End of SQL server processing
+        done # End of resource group processing
+    else
+        # Print message if no resource groups found
+        output_user_info "No resource groups found"
+    fi # End of resource group processing
+done # End of subscription processing
