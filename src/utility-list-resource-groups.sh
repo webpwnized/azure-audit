@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Debug: ./utility-list-resource-groups.sh --subscription b09bcb9d-e055-4950-a9dd-2ab6002ef86c --resource-group rg-scd-dev
+
 # Source common constants and functions
 source ./common-constants.inc
 source ./functions.inc
@@ -62,40 +64,46 @@ function output_resource_group_text() {
 # Parse resource group information
 function parse_resource_group() {
     # Parse resource group information from JSON
-    RESOURCE_GROUP_NAME=$(echo $RESOURCE_GROUP | jq -rc '.name')
-    RESOURCE_GROUP_LOCATION=$(echo $RESOURCE_GROUP | jq -rc '.location')
-    RESOURCE_GROUP_APPLICATION_CODE=$(echo $RESOURCE_GROUP | jq -rc '.tags.applicationCode')
-    RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE=$(echo $RESOURCE_GROUP | jq -rc '.tags.departmentChargeCode')
-    RESOURCE_GROUP_PAR=$(echo $RESOURCE_GROUP | jq -rc '.tags.par')
-    RESOURCE_GROUP_REQUESTOR_AD_ID=$(echo $RESOURCE_GROUP | jq -rc '.tags.requestorAdId')
-    RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID=$(echo $RESOURCE_GROUP | jq -rc '.tags.requestorEmployeeId')  
+    RESOURCE_GROUP_NAME=$(jq -rc '.name // empty' <<< "$RESOURCE_GROUP")
+    RESOURCE_GROUP_LOCATION=$(jq -rc '.location // empty' <<< "$RESOURCE_GROUP")
+    RESOURCE_GROUP_APPLICATION_CODE=$(jq -rc '.tags.applicationCode // empty' <<< "$RESOURCE_GROUP")
+    RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE=$(jq -rc '.tags.departmentChargeCode // empty' <<< "$RESOURCE_GROUP")
+    RESOURCE_GROUP_PAR=$(jq -rc '.tags.par // empty' <<< "$RESOURCE_GROUP")
+    RESOURCE_GROUP_REQUESTOR_AD_ID=$(jq -rc '.tags.requestorAdId // empty' <<< "$RESOURCE_GROUP")
+    RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID=$(jq -rc '.tags.requestorEmployeeId // empty' <<< "$RESOURCE_GROUP")
 }
 
-# Parse subscription information
 function parse_subscription() {
     # Parse subscription information from JSON
-    SUBSCRIPTION_NAME=$(echo $SUBSCRIPTION | jq -rc '.displayName')
-    SUBSCRIPTION_STATE=$(echo $SUBSCRIPTION | jq -rc '.state')
-    SUBSCRIPTION_ID=$(echo $SUBSCRIPTION | jq -rc '.subscriptionId')
+    SUBSCRIPTION_NAME=$(jq -rc '.displayName // empty' <<< "$SUBSCRIPTION")
+    SUBSCRIPTION_STATE=$(jq -rc '.state // empty' <<< "$SUBSCRIPTION")
+    SUBSCRIPTION_ID=$(jq -rc '.subscriptionId // empty' <<< "$SUBSCRIPTION")
+}
+
+function get_role_assignments() {
+    # Get role assignments and store in a variable
+    ROLE_ASSIGNMENTS=$(get_resource_group_role_assignments "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
 }
 
 # Function to get and process role assignments
-function process_role_assignments() {
-    # Get role assignments and store in a variable
-    ROLE_ASSIGNMENTS=$(get_resource_group_role_assignments "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-
+function parse_role_assignments() {
+    
     # Initialize associative array to store unique members
     declare -A unique_members
 
     # Iterate through each role assignment using a while loop
     while IFS='' read -r ROLE_ASSIGNMENT; do
-        PRINCIPLE_TYPE=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.principalType')
+        
+        output_debug_info "Role Assignment (JSON): $ROLE_ASSIGNMENT"
 
+        PRINCIPLE_TYPE=$(jq -rc '.principalType // empty' <<< "$ROLE_ASSIGNMENT")
+        ROLE_NAME=$(jq -rc '.roleDefinitionName // empty' <<< "$ROLE_ASSIGNMENT")
+        
         if [[ $PRINCIPLE_TYPE == "User" ]]; then
-            PRINCIPLE_NAME=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.principalName')
+            PRINCIPLE_NAME=$(jq -rc '.principalName // empty' <<< "$ROLE_ASSIGNMENT")
             unique_members["$PRINCIPLE_NAME"]=1  # Store unique user in the associative array
         elif [[ $PRINCIPLE_TYPE == "Group" ]]; then
-            GROUP_NAME=$(echo "$ROLE_ASSIGNMENT" | jq -rc '.principalName')
+            GROUP_NAME=$(jq -rc '.principalName // empty' <<< "$ROLE_ASSIGNMENT")
             GROUP_MEMBERS=$(get_group_members_serialized "$GROUP_NAME")
 
             # Split group members and add unique members to the associative array
@@ -147,23 +155,19 @@ if [[ $SUBSCRIPTIONS != "[]" ]]; then
                 parse_resource_group
                 
                 # Get and process role assignments
-                process_role_assignments
+                get_role_assignments
+                output_debug_info "Role Assignments (JSON): $ROLE_ASSIGNMENTS"
+                parse_role_assignments
 
                 # Output resource group details
                 output_resource_group
             done
         else
             # Print message if no resource groups found for subscription
-            if [[ $CSV != "True" ]]; then
-                echo "No resource groups found for subscription $SUBSCRIPTION_NAME"
-                echo $BLANK_LINE
-            fi
+            output_debug_info "No resource groups found for subscription $SUBSCRIPTION_NAME"
         fi
     done
 else
     # Print message if no subscriptions found
-    if [[ $CSV != "True" ]]; then
-        echo "No subscriptions found"
-        echo $BLANK_LINE
-    fi
+    output_debug_info "No subscriptions found"
 fi
