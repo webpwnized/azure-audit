@@ -4,7 +4,7 @@
 
 # Source common constants and functions
 source ./common-constants.inc
-source ./functions.inc
+source ./common-functions.inc
 
 # Output header based on CSV flag
 function output_header() {
