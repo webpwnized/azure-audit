@@ -20,3 +20,10 @@ if is_command_installed whois; then
 else
     WHOIS_INSTALLED="False"
 fi
+
+# Check if sqlcmd is installed, then set the flag
+if is_command_installed curl; then
+   CURL_INSTALLED="True"
+else
+    CURL_INSTALLED="False"
+fi
