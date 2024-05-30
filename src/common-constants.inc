@@ -8,13 +8,6 @@ is_command_installed() {
 }
 
 # Check if sqlcmd is installed, then set the flag
-if is_command_installed sqlcmd; then
-    SQL_SERVER_SQLCMD_INSTALLED="True"
-else
-    SQL_SERVER_SQLCMD_INSTALLED="False"
-fi
-
-# Check if sqlcmd is installed, then set the flag
 if is_command_installed whois; then
     WHOIS_INSTALLED="True"
 else
