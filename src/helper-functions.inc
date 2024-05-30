@@ -21,15 +21,9 @@ function output_user_info() {
 # Function to encode output for use in CSV files
 function encode_for_csv() {
     local input="$1"
-    local output="$input"
-
+    
     # Escape double quotes by replacing them with two double quotes
-    output="${output//\"/\"\"}"
-
-    # If the string contains commas, double quotes, or newlines, wrap it in double quotes
-    if [[ "$output" =~ [,\"$'\n'] ]]; then
-        output="\"$output\""
-    fi
+    local output="${input//\"/\"\"}"
 
     echo "$output"
 }
@@ -64,6 +58,6 @@ function get_org_info_from_whois() {
     ORG_ZIP="${ORG_ZIP:-Unknown}"
     
     # Encode for CSV and combine results
-    local ENCODED_OUTPUT=$(encode_for_csv "$ORG_NAME-$ORG_DESCRIPTION-$ORG_CITY-$ORG_STATE-$ORG_ZIP-$ORG_COUNTRY")
+    local ENCODED_OUTPUT="$(encode_for_csv "$ORG_NAME-$ORG_DESCRIPTION-$ORG_CITY-$ORG_STATE-$ORG_ZIP-$ORG_COUNTRY")"
     echo "$ENCODED_OUTPUT"
 }
