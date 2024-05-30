@@ -5,6 +5,32 @@
 
 # Debug: ./cis-4.1.2-azure-sql-databases-allowing-ingress.sh --subscription b09bcb9d-e055-4950-a9dd-2ab6002ef86c --resource-group rg-scd-dev
 
+# Output Fields Documentation
+
+# SQL_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG
+# Values: "True" or "False"
+# Description: Indicates if public network access to the SQL server is enabled. It is set to "True" if the publicNetworkAccess property of the SQL server is "Enabled", otherwise it is "False".
+
+# SQL_SERVER_OUTBOUND_NETWORK_ACCESS_VIOLATION_FLAG
+# Values: "True" or "False"
+# Description: Indicates if outbound network access is restricted. It is set to "True" if the restrictOutboundNetworkAccess property of the SQL server is not "Enable", otherwise it is "False".
+
+# SQL_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG
+# Values: "True" or "False"
+# Description: Indicates if the Transport Layer Security (TLS) version is set to anything other than 1.2. It is set to "True" if the minimalTlsVersion property of the SQL server is not "1.2", otherwise it is "False".
+
+# SQL_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG
+# Values: "True" or "False"
+# Description: Indicates if there is a firewall rule that allows all IP addresses to access the SQL server. It is set to "True" if the firewall rule name is "allowAll" or if the start and end IP addresses of the firewall rule are "0.0.0.0" and "255.255.255.255" respectively, otherwise it is "False".
+
+# SQL_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG
+# Values: "True" or "False"
+# Description: Indicates if the firewall rule allows public ingress from any IP address that is not within private IP ranges (10.x.x.x, 172.16.x.x - 172.31.x.x, 192.168.x.x, and 127.x.x.x). It is set to "True" if the start IP address does not match these private ranges, otherwise it is "False".
+
+# SQL_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG
+# Values: "True" or "False"
+# Description: Indicates if the firewall rule allows all Windows Azure IPs to access the SQL server. It is set to "True" if the firewall rule name is "AllowAllWindowsAzureIps", otherwise it is "False".
+
 # Include common constants and functions
 source ./common-constants.inc
 source ./common-functions.inc

@@ -48,12 +48,12 @@ function get_org_info_from_whois() {
 
     WHOIS_OUTPUT=$(whois "$IP_ADDRESS")
     
-    ORG_NAME=$(echo "$WHOIS_OUTPUT" | grep -i 'org-name\|OrgName\|organization\|Org\|owner' | head -n 1 | awk -F: '{print $2}' | xargs)
+    ORG_NAME=$(echo "$WHOIS_OUTPUT" | grep -i 'org-name\|OrgName\|organization\|Org\|owner\|CustName\|Customer' | head -n 1 | awk -F: '{print $2}' | xargs)
     ORG_DESCRIPTION=$(echo "$WHOIS_OUTPUT" | grep -i 'desc\|Description\|descr' | head -n 1 | awk -F: '{print $2}' | xargs)
-    ORG_COUNTRY=$(echo "$WHOIS_OUTPUT" | grep -i 'country\|Country\|c\|CountryCode' | head -n 1 | awk -F: '{print $2}' | xargs)
+    ORG_COUNTRY=$(echo "$WHOIS_OUTPUT" | grep -i 'country\|Country\|CountryCode' | head -n 1 | awk -F: '{print $2}' | xargs)
     ORG_CITY=$(echo "$WHOIS_OUTPUT" | grep -i 'city\|City\|locality\|Locality' | head -n 1 | awk -F: '{print $2}' | xargs)
     ORG_STATE=$(echo "$WHOIS_OUTPUT" | grep -i 'state\|State\|region\|Region\|province\|Province' | head -n 1 | awk -F: '{print $2}' | xargs)
-    ORG_ZIP=$(echo "$WHOIS_OUTPUT" | grep -i 'zip\|Zip\|postal\|Postal\|postcode\|Postcode' | head -n 1 | awk -F: '{print $2}' | xargs)
+    ORG_ZIP=$(echo "$WHOIS_OUTPUT" | grep -i 'zip\|Zip\|postal\|Postal\|postcode\|Postcode\|PostalCode' | head -n 1 | awk -F: '{print $2}' | xargs)
 
     # If the output is empty, assign a default value
     ORG_NAME="${ORG_NAME:-Unknown}"
