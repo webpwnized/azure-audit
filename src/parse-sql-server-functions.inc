@@ -24,7 +24,6 @@ function parse_azure_sql_server() {
     SQL_SERVER_TYPE=$(jq -rc '.type // ""' <<< "$l_SQL_SERVER")
     SQL_SERVER_VERSION=$(jq -rc '.version // ""' <<< "$l_SQL_SERVER")
 
-None
     # Initialize variables
     SQL_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="False"
     SQL_SERVER_OUTBOUND_NETWORK_ACCESS_VIOLATION_FLAG="False"
