@@ -119,3 +119,39 @@ function get_azure_sql_server_firewall_rules() {
         --server="$l_SQL_SERVER_NAME" \
         --output="json" 2>/dev/null
 }
+
+function get_storage_accounts() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    
+    # Get Storage Accounts
+    az storage account list \
+        --output="json" \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME"
+}
+
+function get_storage_account_attributes() {
+    local l_STORAGE_ACCOUNT_NAME="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    local l_SUBSCRIPTION_ID="$3"
+    
+    # Get Storage Account Attributes
+    az storage account show \
+        --name "$l_STORAGE_ACCOUNT_NAME" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --output="json"
+}
+
+get_storage_account_containers() {
+    local l_STORAGE_ACCOUNT_NAME="$1"
+    local l_SUBSCRIPTION_ID="$2"
+    
+    # Get Storage Account Containers
+    az storage container list \
+        --account-name "$l_STORAGE_ACCOUNT_NAME" \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --output="json" \
+        2>/dev/null
+}
