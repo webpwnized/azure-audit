@@ -116,11 +116,7 @@ source ./common-menu.inc
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
 output_debug_info "Subscriptions (JSON): $SUBSCRIPTIONS";
 
-# Check if subscriptions exist
-if [[ $SUBSCRIPTIONS == "[]" ]]; then
-    output_user_info "No subscriptions found.";
-    exit 0
-fi
+check_if_subscriptions_exists "$SUBSCRIPTIONS"
 
 output_header
 

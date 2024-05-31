@@ -61,3 +61,13 @@ function get_org_info_from_whois() {
     local ENCODED_OUTPUT="$(encode_for_csv "$ORG_NAME-$ORG_DESCRIPTION-$ORG_CITY-$ORG_STATE-$ORG_ZIP-$ORG_COUNTRY")"
     echo "$ENCODED_OUTPUT"
 }
+
+function check_if_subscriptions_exists() {
+    local SUBSCRIPTIONS="$1"
+    
+    # Check if subscriptions exist
+    if [[ $SUBSCRIPTIONS == "[]" ]]; then
+        output_user_info "No subscriptions found.";
+        exit 0
+    fi
+}
