@@ -19,18 +19,13 @@ function output_header() {
 # Function to output Security Rule firewall rule
 function output_security_rule() {
 	if [[ $RESOURCE_GROUP_NAME != "Visual Studio"* ]]; then
-		output_security_rule_helper;
-	fi;
-};
-
-# Helper function to output Security Rule firewall rule
-function output_security_rule_helper() {
-	if [[ $CSV == "True" ]]; then
-		output_security_rule_csv;
-	else
-		output_security_rule_text;
-	fi;
-};
+        if [[ $CSV == "True" ]]; then
+            output_security_rule_csv;
+        else
+            output_security_rule_text;
+        fi
+    fi
+}
 
 # Function to output Source Address Prefix
 function output_source_address_prefix() {
@@ -109,18 +104,50 @@ function output_notes() {
     if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "AzureCloud" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "AzureCloud" ]]; then
         echo "Note: AzureCloud represents traffic from or to Azure Cloud infrastructure."
     fi
+
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "AzureTrafficManager" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "AzureTrafficManager" ]]; then
+        echo "Note: AzureTrafficManager means that traffic is allowed from Azure Traffic Manager."
+    fi
+
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "AzurePlatformDNS" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "AzurePlatformDNS" ]]; then
+        echo "Note: AzurePlatformDNS means that traffic is allowed from Azure platform DNS services."
+    fi
+
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "AzureCloudServices" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "AzureCloudServices" ]]; then
+        echo "Note: AzureCloudServices means that traffic is allowed from Azure Cloud Services."
+    fi
+
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "AzureActiveDirectory" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "AzureActiveDirectory" ]]; then
+        echo "Note: AzureActiveDirectory means that traffic is allowed from Azure Active Directory services."
+    fi
+
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "AzureAppService" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "AzureAppService" ]]; then
+        echo "Note: AzureAppService means that traffic is allowed from Azure App Services."
+    fi
+
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "GatewayManager" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "GatewayManager" ]]; then
+        echo "Note: GatewayManager means that traffic is allowed from Azure VPN Gateway Manager."
+    fi
+
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "StorageAccount" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "StorageAccount" ]]; then
+        echo "Note: StorageAccount means that traffic is allowed from or to Azure Storage Accounts."
+    fi
+
+    if [[ "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX" == "AzureKubernetesService" || "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX" == "AzureKubernetesService" ]]; then
+        echo "Note: AzureKubernetesService means that traffic is allowed from Azure Kubernetes Service (AKS)."
+    fi
 }
 
 # Function to output CSV header
 function output_csv_header() {
     cat <<EOF
-"SUBSCRIPTION_NAME","RESOURCE_GROUP_NAME","RESOURCE_GROUP_LOCATION","RESOURCE_GROUP_APPLICATION_CODE","RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE","RESOURCE_GROUP_PAR","RESOURCE_GROUP_REQUESTOR_AD_ID","RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID","NETWORK_SECURITY_GROUP_NAME","NETWORK_SECURITY_GROUP_LOCATION","VIOLATION","OPEN_FROM_INTERNET_VIOLATION","RDP_VIOLATION","SSH_VIOLATION","SQL_SERVER_VIOLATION","HTTP_VIOLATION","UDP_VIOLATION","SECURITY_RULE_NAME","SECURITY_RULE_DESCRIPTION","SECURITY_RULE_ACCESS_CONTROL","SECURITY_RULE_DIRECTION","SECURITY_RULE_PROTOCOL","SOURCE_ADDRESS_PREFIX","SOURCE_PORT_RANGES","DESTINATION_ADDRESS_PREFIX","DESTINATION_PORT_RANGES","NOTES"
+"SUBSCRIPTION_NAME","RESOURCE_GROUP_NAME","RESOURCE_GROUP_LOCATION","RESOURCE_GROUP_APPLICATION_CODE","RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE","RESOURCE_GROUP_PAR","RESOURCE_GROUP_REQUESTOR_AD_ID","RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID","NETWORK_SECURITY_GROUP_NAME","NETWORK_SECURITY_GROUP_LOCATION","VIOLATION","OPEN_FROM_INTERNET_VIOLATION","RDP_VIOLATION","SSH_VIOLATION","DATABASE_VIOLATION","HTTP_VIOLATION","FTP_VIOLATION","EMAIL_VIOLATION","UDP_VIOLATION","ALL_SOURCE_PORTS_ALLOWED_VIOLATION","ALL_DESTINATION_PORTS_ALLOWED_VIOLATION","SECURITY_RULE_NAME","SECURITY_RULE_DESCRIPTION","SECURITY_RULE_ACCESS_CONTROL","SECURITY_RULE_DIRECTION","SECURITY_RULE_PROTOCOL","SOURCE_ADDRESS_PREFIX","SOURCE_PORT_RANGES","DESTINATION_ADDRESS_PREFIX","DESTINATION_PORT_RANGES","NOTES"
 EOF
 }
 
 # Function to output Security Rule firewall rule in CSV format
 function output_security_rule_csv() {
-    echo -n "\"$SUBSCRIPTION_NAME\",\"$RESOURCE_GROUP_NAME\",\"$RESOURCE_GROUP_LOCATION\",\"$RESOURCE_GROUP_APPLICATION_CODE\",\"$RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"$RESOURCE_GROUP_PAR\",\"$RESOURCE_GROUP_REQUESTOR_AD_ID\",\"$RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"$NETWORK_SECURITY_GROUP_NAME\",\"$NETWORK_SECURITY_GROUP_LOCATION\",\"$SECURITY_RULE_VIOLATION\",\"$SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION\",\"$SECURITY_RULE_RDP_VIOLATION\",\"$SECURITY_RULE_SSH_VIOLATION\",\"$SECURITY_RULE_SQL_SERVER_VIOLATION\",\"$SECURITY_RULE_HTTP_VIOLATION\",\"$SECURITY_RULE_UDP_VIOLATION\",\"$SECURITY_RULE_NAME\",\"$SECURITY_RULE_DESCRIPTION\",\"$SECURITY_RULE_ACCESS_CONTROL\",\"$SECURITY_RULE_DIRECTION\",\"$SECURITY_RULE_PROTOCOL\","
+    echo -n "\"$SUBSCRIPTION_NAME\",\"$RESOURCE_GROUP_NAME\",\"$RESOURCE_GROUP_LOCATION\",\"$RESOURCE_GROUP_APPLICATION_CODE\",\"$RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"$RESOURCE_GROUP_PAR\",\"$RESOURCE_GROUP_REQUESTOR_AD_ID\",\"$RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"$NETWORK_SECURITY_GROUP_NAME\",\"$NETWORK_SECURITY_GROUP_LOCATION\",\"$SECURITY_RULE_VIOLATION\",\"$SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION\",\"$SECURITY_RULE_RDP_VIOLATION\",\"$SECURITY_RULE_SSH_VIOLATION\",\"$SECURITY_RULE_DATABASE_VIOLATION\",\"$SECURITY_RULE_HTTP_VIOLATION\",\"$SECURITY_RULE_FTP_VIOLATION\",\"$SECURITY_RULE_EMAIL_VIOLATION\",\"$SECURITY_RULE_UDP_VIOLATION\",\"$SECURITY_RULE_NAME\",\"$SECURITY_RULE_DESCRIPTION\",\"$SECURITY_RULE_ACCESS_CONTROL\",\"$SECURITY_RULE_DIRECTION\",\"$SECURITY_RULE_PROTOCOL\",\"$SECURITY_RULE_ALL_SOURCE_PORTS_ALLOWED_VIOLATION\",\"$SECURITY_RULE_ALL_DESTINATION_PORTS_ALLOWED_VIOLATION\","
     echo -n "\"$(output_source_address_prefix)\","
     echo -n "\"$(output_source_port_ranges)\","
     echo -n "\"$(output_destination_address_prefix)\","
@@ -133,6 +160,7 @@ function output_security_rule_csv() {
 function output_security_rule_text() {
     cat <<EOF
 Subscription Name: $SUBSCRIPTION_NAME
+Subscription ID: $SUBSCRIPTION_ID
 Resource Group Name: $RESOURCE_GROUP_NAME
 Resource Group Location: $RESOURCE_GROUP_LOCATION
 Resource Group Application Code: $RESOURCE_GROUP_APPLICATION_CODE
@@ -146,9 +174,13 @@ Violation: $SECURITY_RULE_VIOLATION
 Open From Internet Violation: $SECURITY_RULE_OPEN_FROM_INTERNET_VIOLATION
 RDP Violation: $SECURITY_RULE_RDP_VIOLATION
 SSH Violation: $SECURITY_RULE_SSH_VIOLATION
-SQL Server Violation: $SECURITY_RULE_SQL_SERVER_VIOLATION
+Database Violation: $SECURITY_RULE_DATABASE_VIOLATION
 HTTP Violation: $SECURITY_RULE_HTTP_VIOLATION
+FTP Violation: $SECURITY_RULE_FTP_VIOLATION
+Email Violation: $SECURITY_RULE_EMAIL_VIOLATION
 UDP Violation: $SECURITY_RULE_UDP_VIOLATION
+All Source Ports Allowed Violation: $SECURITY_RULE_ALL_SOURCE_PORTS_ALLOWED_VIOLATION
+All Destination Ports Allowed Violation: $SECURITY_RULE_ALL_DESTINATION_PORTS_ALLOWED_VIOLATION
 Security Rule:
     Name: $SECURITY_RULE_NAME
     Description: $SECURITY_RULE_DESCRIPTION
