@@ -30,36 +30,36 @@ function output_security_rule() {
 # Function to output Source Address Prefix
 function output_source_address_prefix() {
     if [[ -n "$SECURITY_RULE_SOURCE_ADDRESS_PREFIXES" ]]; then
-        echo "Source Address Prefixes: $SECURITY_RULE_SOURCE_ADDRESS_PREFIXES"
+        echo "$SECURITY_RULE_SOURCE_ADDRESS_PREFIXES"
     else
-        echo "Source Address Prefix: $SECURITY_RULE_SOURCE_ADDRESS_PREFIX"
+        echo "$SECURITY_RULE_SOURCE_ADDRESS_PREFIX"
     fi
 }
 
 # Function to output Source Port Ranges
 function output_source_port_ranges() {
     if [[ -n "$SECURITY_RULE_SOURCE_PORT_RANGES" ]]; then
-        echo "Source Port Ranges: $SECURITY_RULE_SOURCE_PORT_RANGES"
+        echo "$SECURITY_RULE_SOURCE_PORT_RANGES"
     else
-        echo "Source Port Range: $SECURITY_RULE_SOURCE_PORT_RANGE"
+        echo "$SECURITY_RULE_SOURCE_PORT_RANGE"
     fi
 }
 
 # Function to output Destination Address Prefix
 function output_destination_address_prefix() {
     if [[ -n "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIXES" ]]; then
-        echo "Destination Address Prefixes: $SECURITY_RULE_DESTINATION_ADDRESS_PREFIXES"
+        echo "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIXES"
     else
-        echo "Destination Address Prefix: $SECURITY_RULE_DESTINATION_ADDRESS_PREFIX"
+        echo "$SECURITY_RULE_DESTINATION_ADDRESS_PREFIX"
     fi
 }
 
 # Function to output Destination Port Ranges
 function output_destination_port_ranges() {
     if [[ -n "$SECURITY_RULE_DESTINATION_PORT_RANGES" ]]; then
-        echo "Destination Port Ranges: $SECURITY_RULE_DESTINATION_PORT_RANGES"
+        echo "$SECURITY_RULE_DESTINATION_PORT_RANGES"
     else
-        echo "Destination Port Range: $SECURITY_RULE_DESTINATION_PORT_RANGE"
+        echo "$SECURITY_RULE_DESTINATION_PORT_RANGE"
     fi
 }
 
