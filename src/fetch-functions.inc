@@ -144,7 +144,7 @@ function get_storage_account_attributes() {
         --output="json"
 }
 
-get_storage_account_containers() {
+function get_storage_account_containers() {
     local l_STORAGE_ACCOUNT_NAME="$1"
     local l_SUBSCRIPTION_ID="$2"
     
@@ -154,4 +154,28 @@ get_storage_account_containers() {
         --subscription "$l_SUBSCRIPTION_ID" \
         --output="json" \
         2>/dev/null
+}
+
+function get_postgres_servers() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    
+    # Get Postgres Servers
+    az postgres server list \
+        --output="json" \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" 2>/dev/null
+}
+
+function get_postgres_server_firewall_rules() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    local l_POSTGRES_SERVER_NAME="$3"
+    
+    # Get Postgres Server Firewall Rules
+    az postgres server firewall-rule list \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" \
+        --server-name="$l_POSTGRES_SERVER_NAME" \
+        --output="json" 2>/dev/null
 }
