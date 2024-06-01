@@ -116,8 +116,8 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                     parse_storage_account_containers "$STORAGE_ACCOUNT_CONTAINERS"
 
 
-                    output_storage_account
-                done
+                    #output_storage_account
+                done # End of storage account loop
             fi
         done # End of resource group loop
     else
