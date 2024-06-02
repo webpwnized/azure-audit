@@ -72,6 +72,16 @@ function output_postgres_server_firewall_rule_text() {
     echo $BLANK_LINE
 }
 
+function clear_postgres_server_firewall_rule_variables() {
+    POSTGRES_SERVER_FIREWALL_RULE_NAME=""
+    POSTGRES_SERVER_FIREWALL_RULE_START_IP_ADDRESS=""
+    POSTGRES_SERVER_FIREWALL_RULE_END_IP_ADDRESS=""
+    POSTGRES_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG=""
+    POSTGRES_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG=""
+    POSTGRES_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG=""
+    POSTGRES_SERVER_FIREWALL_RULE_WHOIS_OUTPUT=""
+}
+
 # Include common menu
 source ./includes/common-menu.inc
 
@@ -124,12 +134,11 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                         echo $POSTGRES_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
                             output_debug_info "Postgres Server Firewall Rule (JSON): $FIREWALL_RULE"
                             parse_postgres_server_firewall_rule "$FIREWALL_RULE"
-                            output_postgres_server_firewall_rule
                         done # End of firewall rule processing
                     else
-                        # Print message if no firewall rules found
-                        output_user_info "No Database Server firewall rules found"
+                       clear_postgres_server_firewall_rule_variables
                     fi # End of firewall rule processing
+                    output_postgres_server_firewall_rule
                 done # End of Database Server processing
             else
                 # Print message if no database servers found
