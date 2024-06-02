@@ -109,6 +109,16 @@ function output_sql_server_firewall_rule_text() {
     echo $BLANK_LINE
 }
 
+function clear_sql_server_firewall_rule_variables() {
+    SQL_SERVER_FIREWALL_RULE_NAME=""
+    SQL_SERVER_FIREWALL_RULE_START_IP_ADDRESS=""
+    SQL_SERVER_FIREWALL_RULE_END_IP_ADDRESS=""
+    SQL_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG=""
+    SQL_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG=""
+    SQL_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG=""
+    SQL_SERVER_FIREWALL_RULE_WHOIS_OUTPUT=""
+}
+
 # Include common menu
 source ./includes/common-menu.inc
 
@@ -161,12 +171,11 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                         echo $SQL_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
                             output_debug_info "SQL Server Firewall Rule (JSON): $FIREWALL_RULE"
                             parse_azure_sql_server_firewall_rule "$FIREWALL_RULE"
-                            output_sql_server_firewall_rule
                         done # End of firewall rule processing
                     else
-                        # Print message if no firewall rules found
-                        output_user_info "No SQL server firewall rules found"
+                        clear_sql_server_firewall_rule_variables
                     fi # End of firewall rule processing
+                    output_sql_server_firewall_rule
                 done # End of SQL server processing
             else
                 # Print message if no SQL servers found
