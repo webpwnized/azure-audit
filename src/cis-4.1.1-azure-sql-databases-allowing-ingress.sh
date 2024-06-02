@@ -171,11 +171,12 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                         echo $SQL_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
                             output_debug_info "SQL Server Firewall Rule (JSON): $FIREWALL_RULE"
                             parse_azure_sql_server_firewall_rule "$FIREWALL_RULE"
+                            output_sql_server_firewall_rule
                         done # End of firewall rule processing
                     else
                         clear_sql_server_firewall_rule_variables
+                        output_sql_server_firewall_rule
                     fi # End of firewall rule processing
-                    output_sql_server_firewall_rule
                 done # End of SQL server processing
             else
                 # Print message if no SQL servers found
