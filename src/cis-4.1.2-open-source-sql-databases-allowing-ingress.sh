@@ -18,33 +18,33 @@ function output_header() {
 
 # Function to output CSV header
 function output_csv_header() {
-    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"RESOURCE_GROUP_APPLICATION_CODE\",\"RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"RESOURCE_GROUP_PAR\",\"RESOURCE_GROUP_REQUESTOR_AD_ID\",\"RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"POSTGRES_SERVER_NAME\",\"POSTGRES_SERVER_TYPE\",\"POSTGRES_SERVER_LOCATION\",\"POSTGRES_SERVER_DOMAIN_NAME\",\"POSTGRES_SERVER_VERSION\",\"POSTGRES_SERVER_ADMIN_LOGIN\",\"POSTGRES_SERVER_TLS_ENFORCED\",\"POSTGRES_SERVER_FIREWALL_RULE_NAME\",\"POSTGRES_SERVER_FIREWALL_RULE_START_IP_ADDRESS\",\"POSTGRES_SERVER_FIREWALL_RULE_END_IP_ADDRESS\",\"POSTGRES_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\",\"POSTGRES_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG\",\"POSTGRES_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG\",\"POSTGRES_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG\",\"POSTGRES_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG\",\"POSTGRES_SERVER_FIREWALL_RULE_WHOIS_OUTPUT\""
+    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"RESOURCE_GROUP_APPLICATION_CODE\",\"RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"RESOURCE_GROUP_PAR\",\"RESOURCE_GROUP_REQUESTOR_AD_ID\",\"RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"DATABASE_SERVER_NAME\",\"DATABASE_SERVER_TYPE\",\"DATABASE_SERVER_LOCATION\",\"DATABASE_SERVER_DOMAIN_NAME\",\"DATABASE_SERVER_VERSION\",\"DATABASE_SERVER_ADMIN_LOGIN\",\"DATABASE_SERVER_TLS_ENFORCED\",\"DATABASE_SERVER_FIREWALL_RULE_NAME\",\"DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS\",\"DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS\",\"DATABASE_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\",\"DATABASE_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT\""
 }
 
 
 # Function to output Database Server firewall rule in CSV format
-function output_postgres_server_firewall_rule_csv() {
-    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$RESOURCE_GROUP_APPLICATION_CODE\",\"$RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"$RESOURCE_GROUP_PAR\",\"$RESOURCE_GROUP_REQUESTOR_AD_ID\",\"$RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"$POSTGRES_SERVER_NAME\",\"$POSTGRES_SERVER_TYPE\",\"$POSTGRES_SERVER_LOCATION\",\"$POSTGRES_SERVER_DOMAIN_NAME\",\"$POSTGRES_SERVER_VERSION\",\"$POSTGRES_SERVER_ADMIN_LOGIN\",\"$POSTGRES_SERVER_TLS_ENFORCED\",\"$POSTGRES_SERVER_FIREWALL_RULE_NAME\",\"$POSTGRES_SERVER_FIREWALL_RULE_START_IP_ADDRESS\",\"$POSTGRES_SERVER_FIREWALL_RULE_END_IP_ADDRESS\",\"$POSTGRES_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\",\"$POSTGRES_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG\",\"$POSTGRES_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG\",\"$POSTGRES_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG\",\"$POSTGRES_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG\",\"$POSTGRES_SERVER_FIREWALL_RULE_WHOIS_OUTPUT\""
+function output_database_server_firewall_rule_csv() {
+    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$RESOURCE_GROUP_APPLICATION_CODE\",\"$RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"$RESOURCE_GROUP_PAR\",\"$RESOURCE_GROUP_REQUESTOR_AD_ID\",\"$RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"$DATABASE_SERVER_NAME\",\"$DATABASE_SERVER_TYPE\",\"$DATABASE_SERVER_LOCATION\",\"$DATABASE_SERVER_DOMAIN_NAME\",\"$DATABASE_SERVER_VERSION\",\"$DATABASE_SERVER_ADMIN_LOGIN\",\"$DATABASE_SERVER_TLS_ENFORCED\",\"$DATABASE_SERVER_FIREWALL_RULE_NAME\",\"$DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS\",\"$DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS\",\"$DATABASE_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\",\"$DATABASE_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT\""
 }
 
 # Function to output Database Server firewall rule
-function output_postgres_server_firewall_rule() {
+function output_database_server_firewall_rule() {
     if [[ $RESOURCE_GROUP_NAME != "Visual Studio"* ]]; then
-        output_postgres_server_firewall_rule_helper
+        output_database_server_firewall_rule_helper
     fi
 }
 
 # Helper function to output Database Server firewall rule
-function output_postgres_server_firewall_rule_helper() {
+function output_database_server_firewall_rule_helper() {
     if [[ $CSV == "True" ]]; then
-        output_postgres_server_firewall_rule_csv
+        output_database_server_firewall_rule_csv
     else
-        output_postgres_server_firewall_rule_text
+        output_database_server_firewall_rule_text
     fi
 }
 
 # Function to output Database Server firewall rule in text format
-function output_postgres_server_firewall_rule_text() {
+function output_database_server_firewall_rule_text() {
     echo "Subscription Name: $SUBSCRIPTION_NAME"
     echo "Subscription ID: $SUBSCRIPTION_ID"
     echo "Resource Group Name: $RESOURCE_GROUP_NAME"
@@ -53,33 +53,33 @@ function output_postgres_server_firewall_rule_text() {
     echo "Resource Group PAR: $RESOURCE_GROUP_PAR"
     echo "Resource Group Requestor AD ID: $RESOURCE_GROUP_REQUESTOR_AD_ID"
     echo "Resource Group Requestor Employee ID: $RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID"
-    echo "Database Server Name: $POSTGRES_SERVER_NAME"
-    echo "Database Server Type: $POSTGRES_SERVER_TYPE"
-    echo "Database Server Location: $POSTGRES_SERVER_LOCATION"
-    echo "Database Server Fully Qualified Domain Name (FQDN): $POSTGRES_SERVER_DOMAIN_NAME"
-    echo "Database Server Version: $POSTGRES_SERVER_VERSION"
-    echo "Database Server Admin Username: $POSTGRES_SERVER_ADMIN_LOGIN"
-    echo "Database Server TLS Enforced: $POSTGRES_SERVER_TLS_ENFORCED"
-    echo "Firewall Rule Name: $POSTGRES_SERVER_FIREWALL_RULE_NAME"
-    echo "Firewall Rule Start IP Address: $POSTGRES_SERVER_FIREWALL_RULE_START_IP_ADDRESS"
-    echo "Firewall Rule End IP Address: $POSTGRES_SERVER_FIREWALL_RULE_END_IP_ADDRESS"
-    echo "Public Network Access Violation: $POSTGRES_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG"
-    echo "Transport Layer Encryption Violation: $POSTGRES_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG"
-    echo "Firewall Rule Allow Public Ingress Violation: $POSTGRES_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG"
-    echo "Firewall Rule Allow All Public Ingress Violation: $POSTGRES_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG"
-    echo "Firewall Rule Allow All Windows IP Violation: $POSTGRES_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG"
-    echo "Whois Information: $POSTGRES_SERVER_FIREWALL_RULE_WHOIS_OUTPUT"
+    echo "Database Server Name: $DATABASE_SERVER_NAME"
+    echo "Database Server Type: $DATABASE_SERVER_TYPE"
+    echo "Database Server Location: $DATABASE_SERVER_LOCATION"
+    echo "Database Server Fully Qualified Domain Name (FQDN): $DATABASE_SERVER_DOMAIN_NAME"
+    echo "Database Server Version: $DATABASE_SERVER_VERSION"
+    echo "Database Server Admin Username: $DATABASE_SERVER_ADMIN_LOGIN"
+    echo "Database Server TLS Enforced: $DATABASE_SERVER_TLS_ENFORCED"
+    echo "Firewall Rule Name: $DATABASE_SERVER_FIREWALL_RULE_NAME"
+    echo "Firewall Rule Start IP Address: $DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS"
+    echo "Firewall Rule End IP Address: $DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS"
+    echo "Public Network Access Violation: $DATABASE_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG"
+    echo "Transport Layer Encryption Violation: $DATABASE_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG"
+    echo "Firewall Rule Allow Public Ingress Violation: $DATABASE_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG"
+    echo "Firewall Rule Allow All Public Ingress Violation: $DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG"
+    echo "Firewall Rule Allow All Windows IP Violation: $DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG"
+    echo "Whois Information: $DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT"
     echo $BLANK_LINE
 }
 
 function clear_postgres_server_firewall_rule_variables() {
-    POSTGRES_SERVER_FIREWALL_RULE_NAME=""
-    POSTGRES_SERVER_FIREWALL_RULE_START_IP_ADDRESS=""
-    POSTGRES_SERVER_FIREWALL_RULE_END_IP_ADDRESS=""
-    POSTGRES_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG=""
-    POSTGRES_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG=""
-    POSTGRES_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG=""
-    POSTGRES_SERVER_FIREWALL_RULE_WHOIS_OUTPUT=""
+    DATABASE_SERVER_FIREWALL_RULE_NAME=""
+    DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS=""
+    DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS=""
+    DATABASE_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG=""
+    DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG=""
+    DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG=""
+    DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT=""
 }
 
 # Include common menu
@@ -115,30 +115,31 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
             parse_resource_group "$RESOURCE_GROUP"
             
             # Get database servers for the resource group
-            declare POSTGRES_SERVERS=$(get_postgres_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-            output_debug_info "Postgres Servers (JSON): $POSTGRES_SERVERS"
+            declare DATABASE_SERVERS=$(get_postgres_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
+            output_debug_info "Postgres Servers (JSON): $DATABASE_SERVERS"
 
             # Process each database server
-            if [[ $POSTGRES_SERVERS != "[]" ]]; then
-                echo $POSTGRES_SERVERS | jq -rc '.[]' | while IFS='' read POSTGRES_SERVER; do
-                    output_debug_info "Postgres Server (JSON): $POSTGRES_SERVER"
+            if [[ $DATABASE_SERVERS != "[]" ]]; then
+                echo $DATABASE_SERVERS | jq -rc '.[]' | while IFS='' read DATABASE_SERVER; do
+                    output_debug_info "Postgres Server (JSON): $DATABASE_SERVER"
 
                     # Parse Database Server information
-                    parse_postgres_server "$POSTGRES_SERVER"
+                    parse_database_server "$DATABASE_SERVER"
                     
                     # Get firewall rules for the Database Server
-                    declare POSTGRES_SERVER_FIREWALL_RULES=$(get_postgres_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$POSTGRES_SERVER_NAME")
-                    output_debug_info "Postgres Server Firewall Rules (JSON): $POSTGRES_SERVER_FIREWALL_RULES"
+                    declare DATABASE_SERVER_FIREWALL_RULES=$(get_postgres_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
+                    output_debug_info "Postgres Server Firewall Rules (JSON): $DATABASE_SERVER_FIREWALL_RULES"
 
-                    if [[ $POSTGRES_SERVER_FIREWALL_RULES != "[]" ]]; then
-                        echo $POSTGRES_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
+                    if [[ $DATABASE_SERVER_FIREWALL_RULES != "[]" ]]; then
+                        echo $DATABASE_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
                             output_debug_info "Postgres Server Firewall Rule (JSON): $FIREWALL_RULE"
-                            parse_postgres_server_firewall_rule "$FIREWALL_RULE"
+                            parse_database_server_firewall_rule "$FIREWALL_RULE"
+                            output_database_server_firewall_rule
                         done # End of firewall rule processing
                     else
-                       clear_postgres_server_firewall_rule_variables
+                        clear_database_server_firewall_rule_variables
+                        output_database_server_firewall_rule
                     fi # End of firewall rule processing
-                    output_postgres_server_firewall_rule
                 done # End of Database Server processing
             else
                 # Print message if no database servers found
