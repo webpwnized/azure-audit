@@ -3,8 +3,8 @@
 # Debug: ./utility-list-resource-groups.sh --subscription b09bcb9d-e055-4950-a9dd-2ab6002ef86c --resource-group rg-scd-dev
 
 # Source common constants and functions
-source ./common-constants.inc
-source ./common-functions.inc
+source ./includes/common-constants.inc
+source ./includes/common-functions.inc
 
 # Output header based on CSV flag
 function output_header() {
@@ -62,7 +62,7 @@ function output_resource_group_text() {
 }
 
 # Source common menu
-source ./common-menu.inc
+source ./includes/common-menu.inc
 
 # Get subscriptions
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");

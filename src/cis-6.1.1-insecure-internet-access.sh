@@ -6,8 +6,8 @@
 # Debug: ./cis-6.1.1-insecure-internet-access.sh -s 1014e3e6-e0cf-44c0-8efe-ba17d0c6e3ed -r rg-scd-prd
 
 # Include common constants and functions
-source ./common-constants.inc;
-source ./common-functions.inc;
+source ./includes/common-constants.inc;
+source ./includes/common-functions.inc;
 
 # Function to output header based on CSV flag
 function output_header() {
@@ -198,7 +198,7 @@ EOF
 }
 
 # Include common menu
-source ./common-menu.inc;
+source ./includes/common-menu.inc;
 
 # Get subscriptions
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
