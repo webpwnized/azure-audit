@@ -94,32 +94,6 @@ function get_resource_group_role_assignments() {
         --output="json"
 }
 
-# Function to get Azure SQL servers
-function get_azure_sql_servers() {
-    local l_SUBSCRIPTION_ID="$1"
-    local l_RESOURCE_GROUP_NAME="$2"
-    
-    # Get Azure SQL servers
-    az sql server list \
-        --output="json" \
-        --subscription="$l_SUBSCRIPTION_ID" \
-        --resource-group="$l_RESOURCE_GROUP_NAME" 2>/dev/null
-}
-
-# Function to get Azure SQL server firewall rules
-function get_azure_sql_server_firewall_rules() {
-    local l_SUBSCRIPTION_ID="$1"
-    local l_RESOURCE_GROUP_NAME="$2"
-    local l_SQL_SERVER_NAME="$3"
-    
-    # Get Azure SQL server firewall rules
-    az sql server firewall-rule list \
-        --subscription="$l_SUBSCRIPTION_ID" \
-        --resource-group="$l_RESOURCE_GROUP_NAME" \
-        --server="$l_SQL_SERVER_NAME" \
-        --output="json" 2>/dev/null
-}
-
 function get_storage_accounts() {
     local l_SUBSCRIPTION_ID="$1"
     local l_RESOURCE_GROUP_NAME="$2"
@@ -156,6 +130,32 @@ function get_storage_account_containers() {
         2>/dev/null
 }
 
+# Function to get Azure SQL servers
+function get_azure_sql_servers() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    
+    # Get Azure SQL servers
+    az sql server list \
+        --output="json" \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" 2>/dev/null
+}
+
+# Function to get Azure SQL server firewall rules
+function get_azure_sql_server_firewall_rules() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    local l_SQL_SERVER_NAME="$3"
+    
+    # Get Azure SQL server firewall rules
+    az sql server firewall-rule list \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" \
+        --server="$l_SQL_SERVER_NAME" \
+        --output="json" 2>/dev/null
+}
+
 function get_postgres_servers() {
     local l_SUBSCRIPTION_ID="$1"
     local l_RESOURCE_GROUP_NAME="$2"
@@ -179,3 +179,52 @@ function get_postgres_server_firewall_rules() {
         --server-name="$l_POSTGRES_SERVER_NAME" \
         --output="json" 2>/dev/null
 }
+
+function get_mysql_servers() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    
+    # Get MySQL Servers
+    az mysql server list \
+        --output="json" \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" 2>/dev/null
+}
+
+function get_mysql_server_firewall_rules() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    local l_MYSQL_SERVER_NAME="$3"
+    
+    # Get MySQL Server Firewall Rules
+    az mysql server firewall-rule list \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" \
+        --server-name="$l_MYSQL_SERVER_NAME" \
+        --output="json" 2>/dev/null
+}
+
+function get_mariadb_servers() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    
+    # Get MariaDB Servers
+    az mariadb server list \
+        --output="json" \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" 2>/dev/null
+}
+
+function get_mariadb_server_firewall_rules() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    local l_MARIADB_SERVER_NAME="$3"
+    
+    # Get MariaDB Server Firewall Rules
+    az mariadb server firewall-rule list \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" \
+        --server-name="$l_MARIADB_SERVER_NAME" \
+        --output="json" 2>/dev/null
+}
+
