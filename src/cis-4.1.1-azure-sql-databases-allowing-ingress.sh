@@ -32,8 +32,8 @@
 # Description: Indicates if the firewall rule allows all Windows Azure IPs to access the SQL server. It is set to "True" if the firewall rule name is "AllowAllWindowsAzureIps", otherwise it is "False".
 
 # Include common constants and functions
-source ./common-constants.inc
-source ./common-functions.inc
+source ./includes/common-constants.inc
+source ./includes/common-functions.inc
 
 # Function to output header based on CSV flag
 function output_header() {
@@ -110,7 +110,7 @@ function output_sql_server_firewall_rule_text() {
 }
 
 # Include common menu
-source ./common-menu.inc
+source ./includes/common-menu.inc
 
 # Get subscriptions
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");

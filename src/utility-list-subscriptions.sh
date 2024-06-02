@@ -3,8 +3,8 @@
 # Debug: ./utility-list-subscriptions.sh --subscription 651b4cdc-83bc-466a-975d-df1a9c2be5b1
 
 # Source common constants and functions
-source ./common-constants.inc
-source ./common-functions.inc
+source ./includes/common-constants.inc
+source ./includes/common-functions.inc
 
 # Output header based on CSV flag
 function output_header() {
@@ -49,7 +49,7 @@ function output_subscription_text() {
 }
 
 # Source common menu
-source ./common-menu.inc
+source ./includes/common-menu.inc
 
 # Get subscriptions
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
