@@ -18,13 +18,13 @@ function output_header() {
 
 # Function to output CSV header
 function output_csv_header() {
-    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"RESOURCE_GROUP_APPLICATION_CODE\",\"RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"RESOURCE_GROUP_PAR\",\"RESOURCE_GROUP_REQUESTOR_AD_ID\",\"RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"DATABASE_SERVER_NAME\",\"DATABASE_SERVER_TYPE\",\"DATABASE_SERVER_LOCATION\",\"DATABASE_SERVER_DOMAIN_NAME\",\"DATABASE_SERVER_VERSION\",\"DATABASE_SERVER_ADMIN_LOGIN\",\"DATABASE_SERVER_TLS_ENFORCED\",\"DATABASE_SERVER_FIREWALL_RULE_NAME\",\"DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS\",\"DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS\",\"DATABASE_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\",\"DATABASE_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT\""
+    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"RESOURCE_GROUP_APPLICATION_CODE\",\"RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"RESOURCE_GROUP_PAR\",\"RESOURCE_GROUP_REQUESTOR_AD_ID\",\"RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"DATABASE_SERVER_NAME\",\"DATABASE_SERVER_DOMAIN_NAME\",\"DATABASE_SERVER_TYPE\",\"DATABASE_SERVER_LOCATION\",\"DATABASE_SERVER_VERSION\",\"DATABASE_SERVER_ADMIN_LOGIN\",\"DATABASE_SERVER_TLS_ENFORCED\",\"DATABASE_SERVER_TLS_VERSION\",\"DATABASE_SERVER_FIREWALL_RULE_NAME\",\"DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS\",\"DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS\",\"DATABASE_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\",\"DATABASE_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG\",\"DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT\""
 }
 
 
 # Function to output Database Server firewall rule in CSV format
 function output_database_server_firewall_rule_csv() {
-    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$RESOURCE_GROUP_APPLICATION_CODE\",\"$RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"$RESOURCE_GROUP_PAR\",\"$RESOURCE_GROUP_REQUESTOR_AD_ID\",\"$RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"$DATABASE_SERVER_NAME\",\"$DATABASE_SERVER_TYPE\",\"$DATABASE_SERVER_LOCATION\",\"$DATABASE_SERVER_DOMAIN_NAME\",\"$DATABASE_SERVER_VERSION\",\"$DATABASE_SERVER_ADMIN_LOGIN\",\"$DATABASE_SERVER_TLS_ENFORCED\",\"$DATABASE_SERVER_FIREWALL_RULE_NAME\",\"$DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS\",\"$DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS\",\"$DATABASE_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\",\"$DATABASE_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT\""
+    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$RESOURCE_GROUP_APPLICATION_CODE\",\"$RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE\",\"$RESOURCE_GROUP_PAR\",\"$RESOURCE_GROUP_REQUESTOR_AD_ID\",\"$RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID\",\"$DATABASE_SERVER_NAME\",\"$DATABASE_SERVER_DOMAIN_NAME\",\"$DATABASE_SERVER_TYPE\",\"$DATABASE_SERVER_LOCATION\",\"$DATABASE_SERVER_VERSION\",\"$DATABASE_SERVER_ADMIN_LOGIN\",\"$DATABASE_SERVER_TLS_ENFORCED\",\"$DATABASE_SERVER_TLS_VERSION\",\"$DATABASE_SERVER_FIREWALL_RULE_NAME\",\"$DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS\",\"$DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS\",\"$DATABASE_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\",\"$DATABASE_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG\",\"$DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT\""
 }
 
 # Function to output Database Server firewall rule
@@ -54,12 +54,13 @@ function output_database_server_firewall_rule_text() {
     echo "Resource Group Requestor AD ID: $RESOURCE_GROUP_REQUESTOR_AD_ID"
     echo "Resource Group Requestor Employee ID: $RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID"
     echo "Database Server Name: $DATABASE_SERVER_NAME"
+    echo "Database Server Fully Qualified Domain Name (FQDN): $DATABASE_SERVER_DOMAIN_NAME"
     echo "Database Server Type: $DATABASE_SERVER_TYPE"
     echo "Database Server Location: $DATABASE_SERVER_LOCATION"
-    echo "Database Server Fully Qualified Domain Name (FQDN): $DATABASE_SERVER_DOMAIN_NAME"
     echo "Database Server Version: $DATABASE_SERVER_VERSION"
     echo "Database Server Admin Username: $DATABASE_SERVER_ADMIN_LOGIN"
     echo "Database Server TLS Enforced: $DATABASE_SERVER_TLS_ENFORCED"
+    echo "Database Server TLS Version: $DATABASE_SERVER_TLS_VERSION"
     echo "Firewall Rule Name: $DATABASE_SERVER_FIREWALL_RULE_NAME"
     echo "Firewall Rule Start IP Address: $DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS"
     echo "Firewall Rule End IP Address: $DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS"
@@ -80,6 +81,95 @@ function clear_postgres_server_firewall_rule_variables() {
     DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG=""
     DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG=""
     DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT=""
+}
+
+function process_postgres_databses() {
+    local SUBSCRIPTION_NAME=$1
+    local RESOURCE_GROUP_NAME=$2
+
+    # Get database servers for the resource group
+    declare DATABASE_SERVERS=$(get_postgres_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
+    output_debug_info "Postgres Servers (JSON): $DATABASE_SERVERS"
+
+    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "Postgres"
+}
+
+function process_maridb_databses() {
+    local SUBSCRIPTION_NAME=$1
+    local RESOURCE_GROUP_NAME=$2
+
+    # Get database servers for the resource group
+    declare DATABASE_SERVERS=$(get_mariadb_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
+    output_debug_info "MariaDB Servers (JSON): $DATABASE_SERVERS"
+
+    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MariaDB"
+}
+
+function process_mysql_databses() {
+    local SUBSCRIPTION_NAME=$1
+    local RESOURCE_GROUP_NAME=$2
+
+    # Get database servers for the resource group
+    declare DATABASE_SERVERS=$(get_mysql_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
+    output_debug_info "MySQL Servers (JSON): $DATABASE_SERVERS"
+
+    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MySQL"
+}
+
+function process_mssql_databses() {
+    local SUBSCRIPTION_NAME=$1
+    local RESOURCE_GROUP_NAME=$2
+
+    # Get database servers for the resource group
+    declare DATABASE_SERVERS=$(get_azure_sql_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
+    output_debug_info "MSSQL Servers (JSON): $DATABASE_SERVERS"
+
+    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MSSQL"
+}
+
+function process_databses() {
+    local SUBSCRIPTION_NAME=$1
+    local RESOURCE_GROUP_NAME=$2
+    local DATABASE_SERVERS=$3
+    local DATABASE_TYPE=$4
+    local DATABASE_SERVER_FIREWALL_RULES=""
+    
+    # Process each database server
+    if [[ $DATABASE_SERVERS != "[]" ]]; then
+        echo $DATABASE_SERVERS | jq -rc '.[]' | while IFS='' read DATABASE_SERVER; do
+            output_debug_info "$DATABASE_TYPE Server (JSON): $DATABASE_SERVER"
+
+            # Parse Database Server information
+            parse_database_server "$DATABASE_SERVER"
+            
+            # Get firewall rules for the Database Server
+            if [[ $DATABASE_TYPE == "Postgres" ]]; then
+                DATABASE_SERVER_FIREWALL_RULES=$(get_postgres_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
+            elif [[ $DATABASE_TYPE == "MariaDB" ]]; then
+                DATABASE_SERVER_FIREWALL_RULES=$(get_mariadb_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
+            elif [[ $DATABASE_TYPE == "MySQL" ]]; then
+                DATABASE_SERVER_FIREWALL_RULES=$(get_mysql_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
+            elif [[ $DATABASE_TYPE == "MSSQL" ]]; then
+                DATABASE_SERVER_FIREWALL_RULES=$(get_azure_sql_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
+            fi
+            
+            output_debug_info "$DATABASE_TYPE Server Firewall Rules (JSON): $DATABASE_SERVER_FIREWALL_RULES"
+
+            if [[ $DATABASE_SERVER_FIREWALL_RULES != "[]" ]]; then
+                echo $DATABASE_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
+                    output_debug_info "$DATABASE_TYPE Server Firewall Rule (JSON): $FIREWALL_RULE"
+                    parse_database_server_firewall_rule "$FIREWALL_RULE"
+                    output_database_server_firewall_rule
+                done # End of firewall rule processing
+            else
+                clear_database_server_firewall_rule_variables
+                output_database_server_firewall_rule
+            fi # End of firewall rule processing
+        done # End of Database Server processing
+    else
+        # Print message if no database servers found
+        output_user_info "No database servers found"
+    fi # End of Database Server processing
 }
 
 # Include common menu
@@ -113,38 +203,13 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
 
             # Parse resource group information
             parse_resource_group "$RESOURCE_GROUP"
+
+            # Get Postgres Servers for the Resource Group
+            process_postgres_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
+            process_maridb_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
+            process_mysql_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
+            process_mssql_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
             
-            # Get database servers for the resource group
-            declare DATABASE_SERVERS=$(get_postgres_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-            output_debug_info "Postgres Servers (JSON): $DATABASE_SERVERS"
-
-            # Process each database server
-            if [[ $DATABASE_SERVERS != "[]" ]]; then
-                echo $DATABASE_SERVERS | jq -rc '.[]' | while IFS='' read DATABASE_SERVER; do
-                    output_debug_info "Postgres Server (JSON): $DATABASE_SERVER"
-
-                    # Parse Database Server information
-                    parse_database_server "$DATABASE_SERVER"
-                    
-                    # Get firewall rules for the Database Server
-                    declare DATABASE_SERVER_FIREWALL_RULES=$(get_postgres_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
-                    output_debug_info "Postgres Server Firewall Rules (JSON): $DATABASE_SERVER_FIREWALL_RULES"
-
-                    if [[ $DATABASE_SERVER_FIREWALL_RULES != "[]" ]]; then
-                        echo $DATABASE_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
-                            output_debug_info "Postgres Server Firewall Rule (JSON): $FIREWALL_RULE"
-                            parse_database_server_firewall_rule "$FIREWALL_RULE"
-                            output_database_server_firewall_rule
-                        done # End of firewall rule processing
-                    else
-                        clear_database_server_firewall_rule_variables
-                        output_database_server_firewall_rule
-                    fi # End of firewall rule processing
-                done # End of Database Server processing
-            else
-                # Print message if no database servers found
-                output_user_info "No database servers found"
-            fi # End of Database Server processing
         done # End of resource group processing
     else
         # Print message if no resource groups found

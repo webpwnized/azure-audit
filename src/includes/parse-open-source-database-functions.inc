@@ -2,7 +2,7 @@
 
 function parse_database_server() {
     local l_DATABASE_SERVER=$1
-    
+
     # Parse DATABASE server information from JSON
     DATABASE_SERVER_NAME=$(jq -rc '.name // ""' <<< "$l_DATABASE_SERVER")
     DATABASE_SERVER_APPLICATION_CODE=$(jq -rc '.tags.applicationCode // ""' <<< "$l_DATABASE_SERVER")
