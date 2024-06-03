@@ -230,7 +230,7 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
             # Parse resource group information
             parse_resource_group "$RESOURCE_GROUP"
 
-            # Get Postgres Servers for the Resource Group
+            # Get Database Servers for the Resource Group
             process_postgres_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
             process_postgres_flexible_databases "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
             process_maridb_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
