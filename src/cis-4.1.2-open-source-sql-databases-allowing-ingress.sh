@@ -73,7 +73,7 @@ function output_database_server_firewall_rule_text() {
     echo $BLANK_LINE
 }
 
-function clear_postgres_server_firewall_rule_variables() {
+function clear_database_server_firewall_rule_variables() {
     DATABASE_SERVER_FIREWALL_RULE_NAME=""
     DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS=""
     DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS=""
