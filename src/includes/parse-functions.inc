@@ -15,11 +15,11 @@ function parse_resource_group() {
     # Parse resource group information from JSON
     RESOURCE_GROUP_NAME=$(jq -r '.name' <<< "$l_RESOURCE_GROUP")
     RESOURCE_GROUP_LOCATION=$(jq -rc '.location // empty' <<< "$l_RESOURCE_GROUP")
-    RESOURCE_GROUP_APPLICATION_CODE=$(jq -r '.tags.applicationCode // ""' <<< "$l_RESOURCE_GROUP")
-    RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE=$(jq -r '.tags.departmentChargeCode // ""' <<< "$l_RESOURCE_GROUP")
-    RESOURCE_GROUP_PAR=$(jq -r '.tags.par // ""' <<< "$l_RESOURCE_GROUP")
-    RESOURCE_GROUP_REQUESTOR_AD_ID=$(jq -r '.tags.requestorAdId // ""' <<< "$l_RESOURCE_GROUP")
-    RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID=$(jq -r '.tags.requestorEmployeeId // ""' <<< "$l_RESOURCE_GROUP")
+    RESOURCE_GROUP_APPLICATION_CODE=$(jq -r '.tags.applicationCode // empty' <<< "$l_RESOURCE_GROUP")
+    RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE=$(jq -r '.tags.departmentChargeCode // empty' <<< "$l_RESOURCE_GROUP")
+    RESOURCE_GROUP_PAR=$(jq -r '.tags.par // empty' <<< "$l_RESOURCE_GROUP")
+    RESOURCE_GROUP_REQUESTOR_AD_ID=$(jq -r 'if .tags then .tags | with_entries(.key |= ascii_downcase) | .requestoradid // empty else empty end' <<< "$l_RESOURCE_GROUP")
+    RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID=$(jq -r 'if .tags then .tags | with_entries(.key |= ascii_downcase) | .requestoremployeeid // empty else empty end' <<< "$l_RESOURCE_GROUP")
 }
 
 # Function to process role assignments
