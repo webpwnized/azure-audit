@@ -180,6 +180,30 @@ function get_postgres_server_firewall_rules() {
         --output="json" 2>/dev/null
 }
 
+function get_postgres_flexible_servers() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    
+    # Get Postgres Flexible Servers
+    az postgres flexible-server list \
+        --output="json" \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" 2>/dev/null
+}
+
+function get_postgres_flexible_server_firewall_rules() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    local l_POSTGRES_FLEXIBLE_SERVER_NAME="$3"
+    
+    # Get Postgres Flexible Server Firewall Rules
+    az postgres flexible-server firewall-rule list \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" \
+        --name="$l_POSTGRES_FLEXIBLE_SERVER_NAME" \
+        --output="json" 2>/dev/null
+}
+
 function get_mysql_servers() {
     local l_SUBSCRIPTION_ID="$1"
     local l_RESOURCE_GROUP_NAME="$2"
@@ -200,7 +224,31 @@ function get_mysql_server_firewall_rules() {
     az mysql server firewall-rule list \
         --subscription="$l_SUBSCRIPTION_ID" \
         --resource-group="$l_RESOURCE_GROUP_NAME" \
-        --server-name="$l_MYSQL_SERVER_NAME" \
+        --name="$l_MYSQL_SERVER_NAME" \
+        --output="json" 2>/dev/null
+}
+
+function get_mysql_flexible_servers() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    
+    # Get MySQL Flexible Servers
+    az mysql flexible-server list \
+        --output="json" \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" 2>/dev/null
+}
+
+function get_mysql_flexible_server_firewall_rules() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    local l_MYSQL_FLEXIBLE_SERVER_NAME="$3"
+    
+    # Get MySQL Flexible Server Firewall Rules
+    az mysql flexible-server firewall-rule list \
+        --subscription="$l_SUBSCRIPTION_ID" \
+        --resource-group="$l_RESOURCE_GROUP_NAME" \
+        --server-name="$l_MYSQL_FLEXIBLE_SERVER_NAME" \
         --output="json" 2>/dev/null
 }
 

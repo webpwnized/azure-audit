@@ -94,6 +94,17 @@ function process_postgres_databses() {
     process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "Postgres"
 }
 
+function process_postgres_flexible_databases() {
+    local SUBSCRIPTION_NAME=$1
+    local RESOURCE_GROUP_NAME=$2
+
+    # Get database servers for the resource group
+    declare DATABASE_SERVERS=$(get_postgres_flexible_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
+    output_debug_info "Postgres Flexible Servers (JSON): $DATABASE_SERVERS"
+
+    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "PostgresFlexible"
+}
+
 function process_maridb_databses() {
     local SUBSCRIPTION_NAME=$1
     local RESOURCE_GROUP_NAME=$2
@@ -114,6 +125,17 @@ function process_mysql_databses() {
     output_debug_info "MySQL Servers (JSON): $DATABASE_SERVERS"
 
     process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MySQL"
+}
+
+function process_mysql_flexible_databses() {
+    local SUBSCRIPTION_NAME=$1
+    local RESOURCE_GROUP_NAME=$2
+
+    # Get database servers for the resource group
+    declare DATABASE_SERVERS=$(get_mysql_flexible_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
+    output_debug_info "MySQL Flexible Servers (JSON): $DATABASE_SERVERS"
+
+    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MySQLFlexible"
 }
 
 function process_mssql_databses() {
@@ -145,10 +167,14 @@ function process_databses() {
             # Get firewall rules for the Database Server
             if [[ $DATABASE_TYPE == "Postgres" ]]; then
                 DATABASE_SERVER_FIREWALL_RULES=$(get_postgres_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
+            elif [[ $DATABASE_TYPE == "PostgresFlexible" ]]; then
+                DATABASE_SERVER_FIREWALL_RULES=$(get_postgres_flexible_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
             elif [[ $DATABASE_TYPE == "MariaDB" ]]; then
                 DATABASE_SERVER_FIREWALL_RULES=$(get_mariadb_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
             elif [[ $DATABASE_TYPE == "MySQL" ]]; then
                 DATABASE_SERVER_FIREWALL_RULES=$(get_mysql_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
+            elif [[ $DATABASE_TYPE == "MySQLFlexible" ]]; then
+                DATABASE_SERVER_FIREWALL_RULES=$(get_mysql_flexible_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
             elif [[ $DATABASE_TYPE == "MSSQL" ]]; then
                 DATABASE_SERVER_FIREWALL_RULES=$(get_azure_sql_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
             fi
@@ -206,8 +232,10 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
 
             # Get Postgres Servers for the Resource Group
             process_postgres_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
+            process_postgres_flexible_databases "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
             process_maridb_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
             process_mysql_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
+            process_mysql_flexible_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
             process_mssql_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME"
             
         done # End of resource group processing
