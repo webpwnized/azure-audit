@@ -202,7 +202,7 @@ source ./includes/common-menu.inc;
 
 # Get subscriptions
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
-output_debug_info "Subscriptions (JSON): $SUBSCRIPTIONS";
+output_debug_info "" "" "Subscriptions" "$SUBSCRIPTIONS";
 
 check_if_subscriptions_exists "$SUBSCRIPTIONS"
 
@@ -211,7 +211,7 @@ output_header;
 # Process each subscription
 echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
     
-    output_debug_info "Subscription (JSON): $SUBSCRIPTION";
+    output_debug_info "" "" "Subscription" "$SUBSCRIPTION";
 
     # Parse subscription information
     parse_subscription "$SUBSCRIPTION"
@@ -223,7 +223,7 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
 
     # Get resource groups for the subscription
     declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME");
-    output_debug_info "Resources Groups (JSON): $RESOURCE_GROUPS";
+    output_debug_info "" "" "Resources Groups" "$RESOURCE_GROUPS";
 
     # Process each resource group
     if [[ $RESOURCE_GROUPS == "[]" ]]; then
@@ -233,14 +233,14 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
     fi
 
     echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
-        output_debug_info "Resources Group (JSON): $RESOURCE_GROUP";
+        output_debug_info "" "" "Resources Group" "$RESOURCE_GROUP";
 
         # Parse resource group information
         parse_resource_group "$RESOURCE_GROUP";
 
         # Get Security Rules for the resource group
         declare NETWORK_SECURITY_GROUPS=$(get_network_security_groups "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME");
-        output_debug_info "Network Security Groups (JSON): $NETWORK_SECURITY_GROUPS"
+        output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Network Security Groups" "$NETWORK_SECURITY_GROUPS"
 
         # Process each Network Security Group
         if [[ $NETWORK_SECURITY_GROUPS == "[]" ]]; then
@@ -249,7 +249,7 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
         fi
         
         echo $NETWORK_SECURITY_GROUPS | jq -rc '.[]' | while IFS='' read NETWORK_SECURITY_GROUP; do
-            output_debug_info "Network Security Group (JSON): $NETWORK_SECURITY_GROUP";
+            output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Network Security Group" "$NETWORK_SECURITY_GROUP";
 
             # Parse Security Rule information
             parse_network_security_group "$NETWORK_SECURITY_GROUP";
@@ -260,10 +260,10 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                 continue
             fi
 
-            output_debug_info "Security Rules (JSON): $NETWORK_SECURITY_GROUP_SECURITY_RULES"
+            output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Security Rules" "$NETWORK_SECURITY_GROUP_SECURITY_RULES"
 
             echo $NETWORK_SECURITY_GROUP_SECURITY_RULES | jq -rc '.[]' | while IFS='' read SECURITY_RULE; do
-                output_debug_info "Security Rule (JSON): $SECURITY_RULE";
+                output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Security Rule" "$SECURITY_RULE";
 
                 # Parse Security Rule information
                 parse_security_rule "$SECURITY_RULE";

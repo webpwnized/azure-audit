@@ -89,9 +89,9 @@ function process_postgres_databses() {
 
     # Get database servers for the resource group
     declare DATABASE_SERVERS=$(get_postgres_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-    output_debug_info "Postgres Servers (JSON): $DATABASE_SERVERS"
+    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Postgres Servers" "$DATABASE_SERVERS"
 
-    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "Postgres"
+    process_databases "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "Postgres"
 }
 
 function process_postgres_flexible_databases() {
@@ -100,9 +100,9 @@ function process_postgres_flexible_databases() {
 
     # Get database servers for the resource group
     declare DATABASE_SERVERS=$(get_postgres_flexible_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-    output_debug_info "Postgres Flexible Servers (JSON): $DATABASE_SERVERS"
+    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Postgres Flexible Servers" "$DATABASE_SERVERS"
 
-    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "PostgresFlexible"
+    process_databases "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "PostgresFlexible"
 }
 
 function process_maridb_databses() {
@@ -111,9 +111,9 @@ function process_maridb_databses() {
 
     # Get database servers for the resource group
     declare DATABASE_SERVERS=$(get_mariadb_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-    output_debug_info "MariaDB Servers (JSON): $DATABASE_SERVERS"
+    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "MariaDB Servers" "$DATABASE_SERVERS"
 
-    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MariaDB"
+    process_databases "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MariaDB"
 }
 
 function process_mysql_databses() {
@@ -122,9 +122,9 @@ function process_mysql_databses() {
 
     # Get database servers for the resource group
     declare DATABASE_SERVERS=$(get_mysql_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-    output_debug_info "MySQL Servers (JSON): $DATABASE_SERVERS"
+    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "MySQL Servers" "$DATABASE_SERVERS"
 
-    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MySQL"
+    process_databases "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MySQL"
 }
 
 function process_mysql_flexible_databses() {
@@ -133,9 +133,9 @@ function process_mysql_flexible_databses() {
 
     # Get database servers for the resource group
     declare DATABASE_SERVERS=$(get_mysql_flexible_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-    output_debug_info "MySQL Flexible Servers (JSON): $DATABASE_SERVERS"
+    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "MySQL Flexible Servers" "$DATABASE_SERVERS"
 
-    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MySQLFlexible"
+    process_databases "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MySQLFlexible"
 }
 
 function process_mssql_databses() {
@@ -144,12 +144,12 @@ function process_mssql_databses() {
 
     # Get database servers for the resource group
     declare DATABASE_SERVERS=$(get_azure_sql_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-    output_debug_info "MSSQL Servers (JSON): $DATABASE_SERVERS"
+    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "MSSQL Servers" "$DATABASE_SERVERS"
 
-    process_databses "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MSSQL"
+    process_databases "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVERS" "MSSQL"
 }
 
-function process_databses() {
+function process_databases() {
     local SUBSCRIPTION_NAME=$1
     local RESOURCE_GROUP_NAME=$2
     local DATABASE_SERVERS=$3
@@ -159,7 +159,7 @@ function process_databses() {
     # Process each database server
     if [[ $DATABASE_SERVERS != "[]" ]]; then
         echo $DATABASE_SERVERS | jq -rc '.[]' | while IFS='' read DATABASE_SERVER; do
-            output_debug_info "$DATABASE_TYPE Server (JSON): $DATABASE_SERVER"
+            output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_TYPE Server" "$DATABASE_SERVER"
 
             # Parse Database Server information
             parse_database_server "$DATABASE_SERVER"
@@ -179,11 +179,11 @@ function process_databses() {
                 DATABASE_SERVER_FIREWALL_RULES=$(get_azure_sql_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_SERVER_NAME")
             fi
             
-            output_debug_info "$DATABASE_TYPE Server Firewall Rules (JSON): $DATABASE_SERVER_FIREWALL_RULES"
+            output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_TYPE Server Firewall Rules" "$DATABASE_SERVER_FIREWALL_RULES"
 
             if [[ $DATABASE_SERVER_FIREWALL_RULES != "[]" ]]; then
                 echo $DATABASE_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
-                    output_debug_info "$DATABASE_TYPE Server Firewall Rule (JSON): $FIREWALL_RULE"
+                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$DATABASE_TYPE Server Firewall Rule" "$FIREWALL_RULE"
                     parse_database_server_firewall_rule "$FIREWALL_RULE"
                     output_database_server_firewall_rule
                 done # End of firewall rule processing
@@ -203,7 +203,7 @@ source ./includes/common-menu.inc
 
 # Get subscriptions
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
-output_debug_info "Subscriptions (JSON): $SUBSCRIPTIONS";
+output_debug_info "" "" "Subscriptions" "$SUBSCRIPTIONS";
 
 check_if_subscriptions_exists "$SUBSCRIPTIONS"
 
@@ -211,21 +211,21 @@ output_header
 
 echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
 
-    output_debug_info "Subscription (JSON): $SUBSCRIPTION"
+    output_debug_info "" "" "Subscription" "$SUBSCRIPTION"
     
     # Parse subscription information
     parse_subscription "$SUBSCRIPTION"
     
     # Get resource groups for the subscription
     declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME")
-    output_debug_info "Resources Groups (JSON): $RESOURCE_GROUPS"
+    output_debug_info "" "" "Resources Groups" "$RESOURCE_GROUPS"
 
     # Process each resource group
     if [[ $RESOURCE_GROUPS != "[]" ]]; then
 
         echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
 
-            output_debug_info "Resource Group (JSON): $RESOURCE_GROUP"   
+            output_debug_info "" "" "Resource Group" "$RESOURCE_GROUP"   
 
             # Parse resource group information
             parse_resource_group "$RESOURCE_GROUP"

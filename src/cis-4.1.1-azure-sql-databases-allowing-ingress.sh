@@ -124,7 +124,7 @@ source ./includes/common-menu.inc
 
 # Get subscriptions
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
-output_debug_info "Subscriptions (JSON): $SUBSCRIPTIONS";
+output_debug_info "" "" "Subscriptions" "$SUBSCRIPTIONS";
 
 check_if_subscriptions_exists "$SUBSCRIPTIONS"
 
@@ -132,44 +132,44 @@ output_header
 
 echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
 
-    output_debug_info "Subscription (JSON): $SUBSCRIPTION"
+    output_debug_info "" "" "Subscription" "$SUBSCRIPTION"
     
     # Parse subscription information
     parse_subscription "$SUBSCRIPTION"
     
     # Get resource groups for the subscription
     declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME")
-    output_debug_info "Resources Groups (JSON): $RESOURCE_GROUPS"
+    output_debug_info "" "" "Resources Groups" "$RESOURCE_GROUPS"
 
     # Process each resource group
     if [[ $RESOURCE_GROUPS != "[]" ]]; then
 
         echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
 
-            output_debug_info "Resource Group (JSON): $RESOURCE_GROUP"   
+            output_debug_info "" "" "Resources Group" "$RESOURCE_GROUP"   
 
             # Parse resource group information
             parse_resource_group "$RESOURCE_GROUP"
             
             # Get SQL servers for the resource group
             declare SQL_SERVERS=$(get_azure_sql_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-            output_debug_info "SQL Servers (JSON): $SQL_SERVERS"
+            output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "SQL Servers" "$SQL_SERVERS"
 
             # Process each SQL server
             if [[ $SQL_SERVERS != "[]" ]]; then
                 echo $SQL_SERVERS | jq -rc '.[]' | while IFS='' read SQL_SERVER; do
-                    output_debug_info "SQL Server (JSON): $SQL_SERVER"
+                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "SQL Server" "$SQL_SERVER"
 
                     # Parse SQL server information
                     parse_azure_sql_server "$SQL_SERVER"
                     
                     # Get firewall rules for the SQL server
                     declare SQL_SERVER_FIREWALL_RULES=$(get_azure_sql_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$SQL_SERVER_NAME")
-                    output_debug_info "SQL Server Firewall Rules (JSON): $SQL_SERVER_FIREWALL_RULES"
+                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "SQL Server Firewall Rules" "$SQL_SERVER_FIREWALL_RULES"
 
                     if [[ $SQL_SERVER_FIREWALL_RULES != "[]" ]]; then
                         echo $SQL_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read FIREWALL_RULE; do
-                            output_debug_info "SQL Server Firewall Rule (JSON): $FIREWALL_RULE"
+                            output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "SQL Server Firewall Rule" "$FIREWALL_RULE"
                             parse_azure_sql_server_firewall_rule "$FIREWALL_RULE"
                             output_sql_server_firewall_rule
                         done # End of firewall rule processing

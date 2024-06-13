@@ -1,11 +1,24 @@
 #!/bin/bash
 
-# Output debug information
-function output_debug_info() {
-    # Check if debug mode is enabled
-    if [[ $DEBUG == "True" && $CSV == "False" ]]; then
-        echo "$1"
-        echo $BLANK_LINE
+# Function to print debug information about JSON data
+output_debug_info() {
+    local SUBSCRIPTION_NAME=$1
+    local RESOURCE_GROUP=$2
+    local DATA_TYPE=$3
+    local JSON_DATA=$4
+
+    if [[ $DEBUG == "True" ]]; then
+        if [[ -n $SUBSCRIPTION_NAME ]]; then
+            echo "Subscription Name: $SUBSCRIPTION_NAME"
+        fi
+        
+        if [[ -n $RESOURCE_GROUP ]]; then
+            echo "Resource Group: $RESOURCE_GROUP"
+        fi
+
+        echo "DEBUG: $DATA_TYPE (JSON):"
+        echo "$(jq -C '.' <<< "$JSON_DATA")"
+        echo "$BLANK_LINE"
     fi
 }
 

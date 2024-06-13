@@ -66,7 +66,7 @@ source ./includes/common-menu.inc
 
 # Get subscriptions
 declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
-output_debug_info "Subscriptions (JSON): $SUBSCRIPTIONS";
+output_debug_info "" "" "Subscriptions" $SUBSCRIPTIONS;
 
 check_if_subscriptions_exists "$SUBSCRIPTIONS"
 
@@ -75,7 +75,7 @@ output_header
 
 # Process each subscription
 echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
-    output_debug_info "Subscription (JSON): $SUBSCRIPTION"
+    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Subscription" "$SUBSCRIPTION"
     
     # Parse subscription information
     parse_subscription "$SUBSCRIPTION"
@@ -83,23 +83,23 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
     # Get resource groups for the subscription
     declare RESOURCE_GROUPS=$(get_resource_groups $SUBSCRIPTION_NAME $p_RESOURCE_GROUP_NAME)
 
-    output_debug_info "Resource Groups (JSON): $RESOURCE_GROUPS"
+    output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Groups" "$RESOURCE_GROUPS"
 
     # Process each resource group
     if [[ $RESOURCE_GROUPS != "[]" ]]; then
         echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
 
-            output_debug_info "Resource Group (JSON): $RESOURCE_GROUP"
+            output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Group" "$RESOURCE_GROUP"
 
             # Parse resource group information
             parse_resource_group "$RESOURCE_GROUP"
             
             STORAGE_ACCOUNTS=$(get_storage_accounts "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
-            output_debug_info "Storage Accounts (JSON): $STORAGE_ACCOUNTS"
+            output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Accounts" "$STORAGE_ACCOUNTS"
             
             if [[ $STORAGE_ACCOUNTS != "[]" ]]; then
                 echo $STORAGE_ACCOUNTS | jq -rc '.[]' | while IFS='' read STORAGE_ACCOUNT; do
-                    output_debug_info "Storage Account (JSON): $STORAGE_ACCOUNT"
+                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account" "$STORAGE_ACCOUNT"
                     parse_storage_account "$STORAGE_ACCOUNT"
 
                     if [[ STORAGE_ACCOUNT_NETWORK_RULESET_DEFAULT_ACTION == "Allow" ]]; then
@@ -107,16 +107,11 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                         exit 1
                     fi
 
-                    STORAGE_ACCOUNT_ATTRIBUTES=$(get_storage_account_attributes "$STORAGE_ACCOUNT_NAME" "$STORAGE_ACCOUNT_RESOURCE_GROUP" "$SUBSCRIPTION_NAME")
-                    output_debug_info "Storage Account Attributes (JSON): $STORAGE_ACCOUNT_ATTRIBUTES"
-                    parse_storage_account_attributes "$STORAGE_ACCOUNT_ATTRIBUTES"
-
                     STORAGE_ACCOUNT_CONTAINERS=$(get_storage_account_containers "$STORAGE_ACCOUNT_NAME" "$SUBSCRIPTION_NAME") 
-                    output_debug_info "Storage Account Containers (JSON): $STORAGE_ACCOUNT_CONTAINERS"
+                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account Containers" "$STORAGE_ACCOUNT_CONTAINERS"
                     parse_storage_account_containers "$STORAGE_ACCOUNT_CONTAINERS"
 
-
-                    #output_storage_account
+                    output_storage_account
                 done # End of storage account loop
             fi
         done # End of resource group loop
