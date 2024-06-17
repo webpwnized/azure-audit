@@ -1,33 +1,82 @@
 #!/bin/bash
 
+#!/bin/bash
+
 function parse_storage_account() {
     STORAGE_ACCOUNT="$1"
 
     STORAGE_ACCOUNT_NAME=$(jq -r '.name' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_LOCATION=$(jq -r '.location' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_RESOURCE_GROUP=$(jq -r '.resourceGroup' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_NETWORK_RULESET_DEFAULT_ACTION=$(jq -r '.networkRuleSet.defaultAction' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_KIND=$(jq -r '.kind' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS=$(jq -r '.properties.allowBlobPublicAccess' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_ALLOW_SHARED_KEY_ACCESS=$(jq -r '.properties.allowSharedKeyAccess' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_AZURE_FILES_IDENTITY_BASED_AUTHENTICATION=$(jq -r '.properties.azureFilesIdentityBasedAuthentication' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_ENABLE_HTTPS_ONLY=$(jq -r '.properties.enableHttpsOnly' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_BLOB=$(jq -r '.primaryEndpoints.blob' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_DFS=$(jq -r '.primaryEndpoints.dfs' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_FILE=$(jq -r '.primaryEndpoints.file' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_QUEUE=$(jq -r '.primaryEndpoints.queue' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_TABLE=$(jq -r '.primaryEndpoints.table' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_WEB=$(jq -r '.primaryEndpoints.web' <<< "$STORAGE_ACCOUNT")
-}
-
-function parse_storage_account_attributes() {
-    STORAGE_ACCOUNT="$1"
-
-    STORAGE_ACCOUNT_NAME=$(jq -r '.name' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_LOCATION=$(jq -r '.location' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_RESOURCE_GROUP=$(jq -r '.resourceGroup' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_ENCRYPTION_SERVICES_BLOB_ENABLED=$(jq -r '.encryption.services.blob.enabled' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_ENCRYPTION_SERVICES_FILE_ENABLED=$(jq -r '.encryption.services.file.enabled' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_ENCRYPTION_SERVICES_QUEUE_ENABLED=$(jq -r '.encryption.services.queue.enabled' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_ENCRYPTION_SERVICES_TABLE_ENABLED=$(jq -r '.encryption.services.table.enabled' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_IS_LOCAL_USER_ENABLED=$(jq -r '.isLocalUserEnabled' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_IS_FTP_ENABLED=$(jq -r '.isFtpEnabled' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_MINIMUM_TLS_VERSION=$(jq -r '.minimumTlsVersion' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_NETWORK_RULESET_BYPASS=$(jq -r '.networkRuleSet.bypass' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_NETWORK_RULESET_IP_RULES=$(jq -r '.networkRuleSet.ipRules' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_NETWORK_RULESET_VIRTUAL_NETWORK_RULES=$(jq -r '.networkRuleSet.virtualNetworkRules' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_NETWORK_RULESET_DEFAULT_ACTION=$(jq -r '.networkRuleSet.defaultAction' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_BLOB=$(jq -r '.primaryEndpoints.blob' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_DFS=$(jq -r '.primaryEndpoints.dfs' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_FILE=$(jq -r '.primaryEndpoints.file' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_QUEUE=$(jq -r '.primaryEndpoints.queue' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_TABLE=$(jq -r '.primaryEndpoints.table' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_WEB=$(jq -r '.primaryEndpoints.web' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_PUBLIC_NETWORK_ACCESS=$(jq -r '.publicNetworkAccess' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_SAS_POLICY=$(jq -r '.sasPolicy' <<< "$STORAGE_ACCOUNT")
+
+    # Initialize violation flags
+    STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG="False"
+    STORAGE_ACCOUNT_ALLOW_SHARED_KEY_ACCESS_VIOLATION_FLAG="False"
+    STORAGE_ACCOUNT_ENABLE_HTTPS_ONLY_VIOLATION_FLAG="False"
+    STORAGE_ACCOUNT_MINIMUM_TLS_VERSION_VIOLATION_FLAG="False"
+    STORAGE_ACCOUNT_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="False"
+    STORAGE_ACCOUNT_ENCRYPTION_SERVICES_VIOLATION_FLAG="False"
+    STORAGE_ACCOUNT_FTP_ENABLED_VIOLATION_FLAG="False"
+    STORAGE_ACCOUNT_LOCAL_USER_ENABLED_VIOLATION_FLAG="False"
+
+    # Check for violations
+    if [ "$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS" == "true" ]; then
+        STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG="True"
+    fi
+
+    if [ "$STORAGE_ACCOUNT_ALLOW_SHARED_KEY_ACCESS" == "true" ]; then
+        STORAGE_ACCOUNT_ALLOW_SHARED_KEY_ACCESS_VIOLATION_FLAG="True"
+    fi
+
+    if [ "$STORAGE_ACCOUNT_ENABLE_HTTPS_ONLY" != "true" ]; then
+        STORAGE_ACCOUNT_ENABLE_HTTPS_ONLY_VIOLATION_FLAG="True"
+    fi
+
+    if [ "$STORAGE_ACCOUNT_MINIMUM_TLS_VERSION" != "TLS1_2" ] && [ "$STORAGE_ACCOUNT_MINIMUM_TLS_VERSION" != "TLS1_3" ]; then
+        STORAGE_ACCOUNT_MINIMUM_TLS_VERSION_VIOLATION_FLAG="True"
+    fi
+
+    if [ "$STORAGE_ACCOUNT_PUBLIC_NETWORK_ACCESS" != "Disabled" ]; then
+        STORAGE_ACCOUNT_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="True"
+    fi
+
+    if [ "$STORAGE_ACCOUNT_ENCRYPTION_SERVICES_BLOB_ENABLED" != "true" ] || 
+       [ "$STORAGE_ACCOUNT_ENCRYPTION_SERVICES_FILE_ENABLED" != "true" ] || 
+       [ "$STORAGE_ACCOUNT_ENCRYPTION_SERVICES_QUEUE_ENABLED" != "true" ] || 
+       [ "$STORAGE_ACCOUNT_ENCRYPTION_SERVICES_TABLE_ENABLED" != "true" ]; then
+        STORAGE_ACCOUNT_ENCRYPTION_SERVICES_VIOLATION_FLAG="True"
+    fi
+
+    if [ "$STORAGE_ACCOUNT_IS_FTP_ENABLED" == "true" ]; then
+        STORAGE_ACCOUNT_FTP_ENABLED_VIOLATION_FLAG="True"
+    fi
+
+    if [ "$STORAGE_ACCOUNT_IS_LOCAL_USER_ENABLED" == "true" ]; then
+        STORAGE_ACCOUNT_LOCAL_USER_ENABLED_VIOLATION_FLAG="True"
+    fi
 }
 
 function parse_storage_account_containers() {
