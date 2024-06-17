@@ -5,6 +5,34 @@
 
 # Debug: ./cis-4.1.2-open-source-sql-databases-allowing-ingress.sh -s b09bcb9d-e055-4950-a9dd-2ab6002ef86c -r rg-dds-dev
 
+# CSV Output Fields:
+
+# SUBSCRIPTION_NAME: Name of the Azure subscription.
+# SUBSCRIPTION_ID: ID of the Azure subscription.
+# RESOURCE_GROUP_NAME: Name of the resource group.
+# RESOURCE_GROUP_APPLICATION_CODE: Application code associated with the resource group.
+# RESOURCE_GROUP_DEPARTMENT_CHARGE_CODE: Department charge code associated with the resource group.
+# RESOURCE_GROUP_PAR: PAR (Project Authorization Request) associated with the resource group.
+# RESOURCE_GROUP_REQUESTOR_AD_ID: Active Directory ID of the resource group requestor.
+# RESOURCE_GROUP_REQUESTOR_EMPLOYEE_ID: Employee ID of the resource group requestor.
+# DATABASE_SERVER_NAME: Name of the database server.
+# DATABASE_SERVER_DOMAIN_NAME: Fully qualified domain name (FQDN) of the database server.
+# DATABASE_SERVER_TYPE: Type of the database server (e.g., Postgres, MySQL).
+# DATABASE_SERVER_LOCATION: Location of the database server.
+# DATABASE_SERVER_VERSION: Version of the database server.
+# DATABASE_SERVER_ADMIN_LOGIN: Admin login name of the database server.
+# DATABASE_SERVER_TLS_ENFORCED: Whether TLS is enforced on the database server.
+# DATABASE_SERVER_TLS_VERSION: TLS version enforced on the database server.
+# DATABASE_SERVER_FIREWALL_RULE_NAME: Name of the firewall rule on the database server.
+# DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS: Start IP address of the firewall rule.
+# DATABASE_SERVER_FIREWALL_RULE_END_IP_ADDRESS: End IP address of the firewall rule.
+# DATABASE_SERVER_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG: Flag indicating a violation of public network access.
+# DATABASE_SERVER_TRANSPORT_LAYER_ENCRYPTION_VIOLATION_FLAG: Flag indicating a violation of transport layer encryption.
+# DATABASE_SERVER_FIREWALL_RULE_ALLOW_PUBLIC_INGRESS_FLAG: Flag indicating a firewall rule allowing public ingress.
+# DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_PUBLIC_INGRESS_FLAG: Flag indicating a firewall rule allowing all public ingress.
+# DATABASE_SERVER_FIREWALL_RULE_ALLOW_ALL_WINDOWS_IP_FLAG: Flag indicating a firewall rule allowing all Windows IPs.
+# DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT: WHOIS output for the firewall rule IP addresses.
+
 # Include common constants and functions
 source ./includes/common-constants.inc
 source ./includes/common-functions.inc
