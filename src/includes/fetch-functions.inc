@@ -105,19 +105,6 @@ function get_storage_accounts() {
         --resource-group="$l_RESOURCE_GROUP_NAME"
 }
 
-function get_storage_account_attributes() {
-    local l_STORAGE_ACCOUNT_NAME="$1"
-    local l_RESOURCE_GROUP_NAME="$2"
-    local l_SUBSCRIPTION_ID="$3"
-    
-    # Get Storage Account Attributes
-    az storage account show \
-        --name "$l_STORAGE_ACCOUNT_NAME" \
-        --resource-group "$l_RESOURCE_GROUP_NAME" \
-        --subscription "$l_SUBSCRIPTION_ID" \
-        --output="json"
-}
-
 function get_storage_account_containers() {
     local l_STORAGE_ACCOUNT_NAME="$1"
     local l_SUBSCRIPTION_ID="$2"
