@@ -263,3 +263,9 @@ function get_mariadb_server_firewall_rules() {
         --output="json" 2>/dev/null
 }
 
+function get_key_vaults() {
+    local subscription_name=$1
+    local resource_group_name=$2
+    az keyvault list --subscription "$subscription_name" --resource-group "$resource_group_name"
+}
+
