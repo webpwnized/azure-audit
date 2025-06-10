@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 function parse_storage_account() {
     STORAGE_ACCOUNT="$1"
 
