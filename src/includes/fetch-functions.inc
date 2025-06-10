@@ -143,6 +143,20 @@ function get_azure_sql_server_firewall_rules() {
         --output="json" 2>/dev/null
 }
 
+# Function to get SQL Server Audit Policy
+function get_sql_server_audit_policy() {
+    local l_sql_server_name="$1"
+    local l_resource_group_name="$2"
+    local l_subscription_id="$3"
+
+    # Get SQL Server Audit Policy
+    az sql server audit-policy show \
+        --name "$l_sql_server_name" \
+        --resource-group "$l_resource_group_name" \
+        --subscription "$l_subscription_id" \
+        --output="json" 2>/dev/null
+}
+
 function get_postgres_servers() {
     local l_SUBSCRIPTION_ID="$1"
     local l_RESOURCE_GROUP_NAME="$2"
