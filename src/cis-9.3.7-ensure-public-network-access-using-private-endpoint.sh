@@ -77,8 +77,13 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
             
             if [[ "$KEY_VAULTS" != "[]" ]]; then
                 echo "$KEY_VAULTS" | jq -rc '.[]' | while IFS='' read -r KEY_VAULT; do
-                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Key Vault" "$KEY_VAULT_NAME"
                     parse_key_vault "$KEY_VAULT"
+                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Key Vault" "$KEY_VAULT_NAME"
+
+                    KEY_VAULT_PUBLIC_NETWORK_ACCESS=$(get_specific_key_vault_information "$KEY_VAULT_NAME" "$RESOURCE_GROUP_NAME")
+                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Key vaults" "$KEY_VAULT_PUBLIC_NETWORK_ACCESS"
+                    
+                    parse_key_vault_public_network_access "$KEY_VAULT_PUBLIC_NETWORK_ACCESS"
 
                     output_key_vault
 

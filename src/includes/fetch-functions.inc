@@ -266,6 +266,23 @@ function get_mariadb_server_firewall_rules() {
 function get_key_vaults() {
     local subscription_name=$1
     local resource_group_name=$2
-    az keyvault list --subscription "$subscription_name" --resource-group "$resource_group_name"
+
+    # Get Key Vaults list
+    az keyvault list \
+        --subscription "$subscription_name" \
+        --resource-group "$resource_group_name" \
+        --output="json" 2>/dev/null
+}
+
+function get_specific_key_vault_information() {
+    local key_vault_name=$1
+    local resource_group_name=$2
+    #local subscription_name=$3 # Optional parameter if needed
+
+    # Get specific Key Vault information
+    az keyvault show \
+        --name "$key_vault_name" \
+        --resource-group "$resource_group_name" \
+        --output="json" 2>/dev/null
 }
 
