@@ -109,7 +109,7 @@ output_header
 
 # Process each subscription
 echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
-    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Subscription" "$SUBSCRIPTION"
+    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Subscription" "$SUBSCRIPTION" #Will this even work(ie: is SUBSCRIPTION_NAME or RESOURCE_GROUP_NAME non existent or empty at this point?)(Would need the line below first - parse_subscription "$SUBSCRIPTION" - to make this work right?)
     
     # Parse subscription information
     parse_subscription "$SUBSCRIPTION"

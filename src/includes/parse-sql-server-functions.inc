@@ -68,3 +68,15 @@ function parse_azure_sql_server_firewall_rule() {
         SQL_SERVER_FIREWALL_RULE_WHOIS_OUTPUT=$(get_org_info_from_whois "$SQL_SERVER_FIREWALL_RULE_START_IP_ADDRESS")
     fi
 }
+
+# Get and parse SQL Server audit settings
+function parse_sql_server_audit_policy() {
+    local audit_policy_json=$1
+
+    SQL_SERVER_AUDITING_ENABLED=$(jq -r '.state // empty' <<< "$audit_policy_json")
+    SQL_SERVER_AUDITING_ENABLED_FLAG="True"
+
+    if [[ "$SQL_SERVER_AUDITING_ENABLED" == "Enabled" ]]; then
+        SQL_SERVER_AUDITING_ENABLED_FLAG="False"
+    fi
+}
