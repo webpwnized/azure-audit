@@ -62,11 +62,11 @@ for subscription in "${subscriptions_array[@]}"; do
         echo "▶️ Running test for $subscription / $rg"
 
         #uncomment below if want to filter further for cis: 10.1
-        sql_server_groups=$(az sql server list --subscription="$subscription" --resource-group="$rg")
-        if [[ "$sql_server_groups" == "[]" ]]; then
-            echo "⚠️ No sql server groups found in subscription: $subscription & resource group: $rg"
-            continue
-        fi
+        # sql_server_groups=$(az sql server list --subscription="$subscription" --resource-group="$rg")
+        # if [[ "$sql_server_groups" == "[]" ]]; then
+        #     echo "⚠️ No sql server groups found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
 
         #uncomment below if want to filter further for cis: 9.3.7
         # key_vault_group=$(az keyvault list --subscription="$subscription" --resource-group="$rg")
