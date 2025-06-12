@@ -58,7 +58,8 @@ function output_sql_server_audit_text() {
 source ./includes/common-menu.inc
 
 # Get subscriptions
-declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
+# declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
+SUBSCRIPTIONS="$(get_subscriptions "$p_SUBSCRIPTION_ID")"
 output_debug_info "" "" "Subscriptions" $SUBSCRIPTIONS;
 
 check_if_subscriptions_exists "$SUBSCRIPTIONS"
