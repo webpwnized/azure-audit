@@ -20,6 +20,14 @@ function output_csv_header() {
     echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_STATE\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"KEY_VAULT_NAME\",\"KEY_VAULT_LOCATION\",\"PUBLIC_NETWORK_ACCESS\",\"VIOLATION_FLAG\""
 }
 
+# Output resource group information
+function output_key_vault_helper() {
+    # Check if the resource group name doesn't start with "Visual Studio"
+    if [[ $RESOURCE_GROUP_NAME != "Visual Studio"* ]]; then
+        output_key_vault
+    fi
+}
+
 function output_key_vault() {
     if [[ $CSV == "True" ]]; then
         output_key_vault_csv
@@ -50,7 +58,7 @@ function output_key_vault_text() {
 source ./includes/common-menu.inc
 
 # Get subscriptions
-declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
+SUBSCRIPTIONS="$(get_subscriptions "$p_SUBSCRIPTION_ID")"
 output_debug_info "" "" "Subscriptions" "$SUBSCRIPTIONS";
 
 check_if_subscriptions_exists "$SUBSCRIPTIONS"
@@ -85,7 +93,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
 
                     parse_key_vault_public_network_access "$KEY_VAULT_PUBLIC_NETWORK_ACCESS"
 
-                    output_key_vault
+                    output_key_vault_helper
 
                 done # End of Key Vault loop
             else
@@ -96,5 +104,3 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
         output_user_info "No resource groups found for subscription $SUBSCRIPTION_NAME"
     fi
 done # End of subscription loop
-
-output_user_info "Audit complete."
