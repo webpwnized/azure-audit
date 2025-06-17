@@ -82,3 +82,13 @@ function parse_storage_account_containers() {
 
     CONTAINERS=$(jq -rc '.properties | .containers[] | {name: .name, publicAccess: .publicAccess}' <<< "$STORAGE_ACCOUNT")
 }
+
+function parse_storage_account_private_endpoint_access() {
+    STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS=$1
+
+    STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG="False"
+
+    if [[ -n "$STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS" ]]; then
+        STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG="True"
+    fi
+}
