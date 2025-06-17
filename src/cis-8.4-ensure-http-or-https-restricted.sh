@@ -2,7 +2,7 @@
 
 # Reference: 
 # https://learn.microsoft.com/en-us/azure/azure-sql/database/security-overview?view=azuresql
-# reference: 8.2 Ensure that SSH access from the Internet is restricted (Automated) - Networking Serivces - CIS_Microsoft_Azure_Foundations_Benchmark_v4.0.0.pdf
+# reference: 8.4 Ensure that HTTP(S) access from the Internet is evaluated and restricted (Automated) - Networking Serivces - CIS_Microsoft_Azure_Foundations_Benchmark_v4.0.0.pdf
 # note: 8.1 already checks for 8.4, so just run 8.1
 
 # Debug: ./cis-8.4-ensure-http-or-https-restricted.sh
