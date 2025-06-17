@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Debug: ./cis-3.7.1-storage-accounts-public-network-access.sh --subscription 651b4cdc-83bc-466a-975d-df1a9c2be5b1 --resource-group rg-PCD-dev
+#reference: 10.3.2.2 Ensure that 'Public Network Access' is 'Disabled' for storage accounts (Automated) - CIS_Microsoft_Azure_Foundations_Benchmark_v4.0.0
+#Also referenced: 17.2.2 Ensure that 'Public Network Access' is 'Disabled' for storage accounts (Automated) - CIS_Microsoft_Azure_Storage_Services_Benchmark_v1.0.0.pdf
+
+# Debug: ./cis-10.3.2.2-ensure-public-network-disabled-storage-account.sh --subscription 651b4cdc-83bc-466a-975d-df1a9c2be5b1 --resource-group rg-PCD-dev
 
 # Source common constants and functions
 source ./includes/common-constants.inc
