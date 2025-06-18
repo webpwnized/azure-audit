@@ -2,8 +2,10 @@
 
 # Reference: 
 # https://learn.microsoft.com/en-us/azure/azure-sql/database/security-overview?view=azuresql
+# reference: 8.1 Ensure that RDP access from the Internet is restricted (Automated) - Networking Serivces - CIS_Microsoft_Azure_Foundations_Benchmark_v4.0.0.pdf
+# note: this script also checks SSH(8.2), UDP(8.3), HTTP/HTTPS(8.4), & many more
 
-# Debug: ./cis-6.1.1-insecure-internet-access.sh -s 1014e3e6-e0cf-44c0-8efe-ba17d0c6e3ed -r rg-scd-prd
+# Debug: ./cis-8.1-ensure-rdp-restricted.sh -s 1014e3e6-e0cf-44c0-8efe-ba17d0c6e3ed -r rg-scd-prd
 
 # Include common constants and functions
 source ./includes/common-constants.inc;
@@ -201,7 +203,7 @@ EOF
 source ./includes/common-menu.inc;
 
 # Get subscriptions
-declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
+SUBSCRIPTIONS="$(get_subscriptions "$p_SUBSCRIPTION_ID")"
 output_debug_info "" "" "Subscriptions" "$SUBSCRIPTIONS";
 
 check_if_subscriptions_exists "$SUBSCRIPTIONS"

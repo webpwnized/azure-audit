@@ -2,8 +2,9 @@
 
 # Reference: 
 # https://learn.microsoft.com/en-us/azure/azure-sql/database/security-overview?view=azuresql
+# Reference: 10.2 Ensure no Azure SQL Databases allow ingress from 0.0.0.0/0 (ANY IP) (Automated) - CIS_Microsoft_Azure_Database_Services_Benchmark_v1.0.0.pdf
 
-# Debug: ./cis-4.1.2-azure-sql-databases-allowing-ingress.sh --subscription b09bcb9d-e055-4950-a9dd-2ab6002ef86c --resource-group rg-scd-dev
+# Debug: ./cis-10.2-ensure-sql-database-not-ingress-from-ip.sh --subscription b09bcb9d-e055-4950-a9dd-2ab6002ef86c --resource-group rg-scd-dev
 
 # Output Fields Documentation
 
