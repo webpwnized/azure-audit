@@ -300,3 +300,44 @@ function get_specific_key_vault_information() {
         --output="json" 2>/dev/null
 }
 
+function get_storage_account_private_endpoint_access() {
+    local storage_account_name=$1
+    local resource_group_name=$2
+    local subscription_name=$3
+    
+    # Get Storage Account Private Endpoint Connections
+    az storage account show \
+        --subscription "$subscription_name" \
+        --resource-group "$resource_group_name" \
+        --name "$storage_account_name" \
+        --query "privateEndpointConnections[0].id" \
+        --output="json" 2>/dev/null
+}
+
+function get_storage_account_network_default() {
+    local storage_account_name=$1
+    local resource_group_name=$2
+    local subscription_name=$3
+    
+    # Get Storage Account Network Default Action - might need to just do: networkRuleSet.defaultAction <--or try networkRuleSet.DefaultAction
+    az storage account show \
+        --subscription "$subscription_name" \
+        --resource-group "$resource_group_name" \
+        --name "$storage_account_name" \
+        --query "[*].networkRuleSet" \
+        --output="json" 2>/dev/null
+}
+
+function get_storage_account_allow_blob_public_access() {
+    local storage_account_name=$1
+    local resource_group_name=$2
+    local subscription_name=$3
+    
+    # Get Storage Account Allow Blob Public Access - might just need name and not subscription nor resource name
+    az storage account show \
+        --subscription "$subscription_name" \
+        --resource-group "$resource_group_name" \
+        --name "$storage_account_name" \
+        --query "allowBlobPublicAccess" \
+        --output="json" 2>/dev/null
+}

@@ -82,3 +82,35 @@ function parse_storage_account_containers() {
 
     CONTAINERS=$(jq -rc '.properties | .containers[] | {name: .name, publicAccess: .publicAccess}' <<< "$STORAGE_ACCOUNT")
 }
+
+function parse_storage_account_private_endpoint_access() {
+    STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS=$1
+
+    STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG="False"
+
+    if [[ -n "$STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS" ]]; then
+        STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG="True"
+    fi
+}
+
+function parse_storage_account_default_network_acess() {
+    STORAGE_ACCOUNT_DEFAULT_NETWORK=$1
+
+    STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE=$(jq -r '.DefaultAction // empty' <<< "$STORAGE_ACCOUNT_DEFAULT_NETWORK")
+
+    STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE_VIOLATION_FLAG="False"
+
+    if [[ "$STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE" != "Deny" ]]; then
+        STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE_VIOLATION_FLAG="True"
+    fi
+}
+
+function parse_storage_account_allow_blob_public_access() {
+    STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS=$1
+
+    STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG="False"
+
+    if [[ "$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS" != "false" ]]; then
+        STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG="True"
+    fi
+}
