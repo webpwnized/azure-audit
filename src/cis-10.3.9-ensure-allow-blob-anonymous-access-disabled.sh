@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Reference: 10.3.2.3 Ensure default network access rule for storage accounts is set to deny (Automated)  - CIS_Microsoft_Azure_Foundations_Benchmark_v4.0.0.pdf
+# Reference: 10.3.9 Ensure that 'Allow Blob Anonymous Access' is set to 'Disabled' (Automated) - CIS_Microsoft_Azure_Foundations_Benchmark_v4.0.0.pdf
 
-# Debug: ./cis-10.3.2.3-ensure-default-network-access-storage-accounts-set-deny.sh --subscription 651b4cdc-83bc-466a-975d-df1a9c2be5b1 --resource-group rg-PCD-dev
+# Debug: ./cis-10.3.9-ensure-allow-blob-anonymous-access-disabled.sh --subscription 651b4cdc-83bc-466a-975d-df1a9c2be5b1 --resource-group rg-PCD-dev
 
 # Source common constants and functions
 source ./includes/common-constants.inc
@@ -19,7 +19,7 @@ function output_header() {
 # Output CSV header
 function output_csv_header() {
     # Output CSV header line
-    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_STATE\",\"RESOURCE_GROUP_NAME\",\"STORAGE_ACCOUNT_NAME\",\"STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE\",\"STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE_VIOLATION_FLAG\""
+    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_STATE\",\"RESOURCE_GROUP_NAME\",\"STORAGE_ACCOUNT_NAME\",\"STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS\",\"STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG\""
 }
 
 # Output resource group information
@@ -43,7 +43,7 @@ function output_storage_account_helper() {
 # Output resource group information in CSV format
 function output_storage_account_csv() {
     # Output resource group details in CSV format
-    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_STATE\",\"$RESOURCE_GROUP_NAME\",\"$STORAGE_ACCOUNT_NAME\",\"$STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE\",\"$STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE_VIOLATION_FLAG\""
+    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_STATE\",\"$RESOURCE_GROUP_NAME\",\"$STORAGE_ACCOUNT_NAME\",\"$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS\",\"$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG\""
 }
 
 # Output resource group information in text format
@@ -53,8 +53,8 @@ function output_storage_account_text() {
     echo "Subscription State: $SUBSCRIPTION_STATE"
     echo "Resource Group Name: $RESOURCE_GROUP_NAME"
     echo "Storage Account Name: $STORAGE_ACCOUNT_NAME"
-    echo "Storage Account Private Endpoint Access: $STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE"
-    echo "Storage Account Private Endpoint Access Violation Flag: $STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE_VIOLATION_FLAG"
+    echo "Storage Account Private Endpoint Access: $STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS"
+    echo "Storage Account Private Endpoint Access Violation Flag: $STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG"
     echo $BLANK_LINE
 }
 
@@ -99,10 +99,10 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account" "$STORAGE_ACCOUNT"
                     parse_storage_account "$STORAGE_ACCOUNT"
 
-                    STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS=$(get_storage_account_network_default "$STORAGE_ACCOUNT_NAME" "$RESOURCE_GROUP_NAME" "$SUBSCRIPTION_NAME")
-                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account Deafult Network Access" "$STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS"
+                    STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC=$(get_storage_account_allow_blob_public_access "$STORAGE_ACCOUNT_NAME" "$RESOURCE_GROUP_NAME" "$SUBSCRIPTION_NAME")
+                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account Private Endpoint Access" "$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC"
 
-                    parse_storage_account_default_network_acess "$STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS"
+                    parse_storage_account_allow_blob_public_access "$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC"
 
                     output_storage_account
                 done # End of storage account loop

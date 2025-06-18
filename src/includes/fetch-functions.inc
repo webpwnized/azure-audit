@@ -327,3 +327,17 @@ function get_storage_account_network_default() {
         --query "[*].networkRuleSet" \
         --output="json" 2>/dev/null
 }
+
+function get_storage_account_allow_blob_public_access() {
+    local storage_account_name=$1
+    local resource_group_name=$2
+    local subscription_name=$3
+    
+    # Get Storage Account Allow Blob Public Access - might just need name and not subscription nor resource name
+    az storage account show \
+        --subscription "$subscription_name" \
+        --resource-group "$resource_group_name" \
+        --name "$storage_account_name" \
+        --query "allowBlobPublicAccess" \
+        --output="json" 2>/dev/null
+}
