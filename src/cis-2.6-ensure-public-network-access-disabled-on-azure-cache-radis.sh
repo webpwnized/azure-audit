@@ -17,7 +17,7 @@ function output_header() {
 
 # Output CSV header
 function output_csv_header() {
-    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_STATE\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"REDIS_INSTANCE\",\"AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS\",\"AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\""
+    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_STATE\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"REDIS_CACHE_NAME\",\"REDIS_CACHE_LOCATION\",\"REDIS_CACHE_PUBLIC_NETWORK_ACCESS\",\"REDIS_CACHE_SUBNET_ID\",\"REDIS_CACHE_PRIVATE_ENDPOINTS\",\"AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS\",\"REDIS_CACHE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\""
 }
 
 # Output resource group information
@@ -38,7 +38,7 @@ function output_redis_list() {
 
 # Output Key Vault information in CSV format
 function output_redis_list_csv() {
-    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_STATE\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$REDIS_INSTANCE\",\"$AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS\",\"$AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\""
+    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_STATE\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$REDIS_CACHE_NAME\",\"$REDIS_CACHE_LOCATION\",\"$REDIS_CACHE_PUBLIC_NETWORK_ACCESS\",\"$REDIS_CACHE_SUBNET_ID\",\"$REDIS_CACHE_PRIVATE_ENDPOINTS\",\"$AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS\",\"$REDIS_CACHE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\""
 }
 
 # Output Key Vault information in text format
@@ -47,9 +47,15 @@ function output_redis_list_text() {
     echo "Subscription State: $SUBSCRIPTION_STATE"
     echo "Subscription ID: $SUBSCRIPTION_ID"
     echo "Resource Group Name: $RESOURCE_GROUP_NAME"
-    echo "Redis Instance: $REDIS_INSTANCE"
+    echo "Redis Cache Name: $REDIS_CACHE_NAME"
+    echo "Redis Cache Location: $REDIS_CACHE_LOCATION"
+    echo "Redis Cache Public Network Access: $REDIS_CACHE_PUBLIC_NETWORK_ACCESS"
+    echo "Redis Cache Subnet ID: $REDIS_CACHE_SUBNET_ID"
+    echo "Redis Cache Private Endpoints: $REDIS_CACHE_PRIVATE_ENDPOINTS"
+    echo "Redis Cache Is VNet Injected: $REDIS_CACHE_IS_VNET_INJECTED"
+    echo "Redis Cache Has Private Endpoint: $REDIS_CACHE_HAS_PRIVATE_ENDPOINT"
     echo "Azure Cache Redis Public Network Access: $AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS"
-    echo "Violation Flag: $AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG"
+    echo "Violation Flag: $REDIS_CACHE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG"
     echo $BLANK_LINE
 }
 
@@ -85,12 +91,12 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
             if [[ "$REDIS_LISTS" != "[]" ]]; then
                 echo "$REDIS_LISTS" | jq -rc '.[]' | while IFS='' read -r REDIS_LIST; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Redis List" "$REDIS_LIST"
-                    # parse_key_vault "$KEY_VAULT"
+                    parse_redis_list "$REDIS_LIST"
 
-                    # KEY_VAULT_PUBLIC_NETWORK_ACCESS=$(get_specific_key_vault_information "$KEY_VAULT_NAME" "$RESOURCE_GROUP_NAME")
-                    # output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Key vault public network access" "$KEY_VAULT_PUBLIC_NETWORK_ACCESS"
+                    REDIS_DETAILS=$(get_azure_redis_details "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$REDIS_CACHE_NAME")
+                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Redis Details" "$REDIS_DETAILS"
 
-                    # parse_key_vault_public_network_access "$KEY_VAULT_PUBLIC_NETWORK_ACCESS"
+                    parse_redis_details "$REDIS_DETAILS"
 
                     output_redis_list_helper
 
@@ -103,13 +109,3 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
         output_user_info "No resource groups found for subscription $SUBSCRIPTION_NAME"
     fi
 done # End of subscription loop
-
-function get_azure_redis_list() {
-    local subscription_name=$1
-    local resource_group_name=$2
-
-    az redis list \
-        --subscription "$subscription_name" \
-        --resource-group "$resource_group_name" \
-        --output="json" 2>/dev/null
-}

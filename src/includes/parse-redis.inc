@@ -3,28 +3,23 @@
 function parse_redis_list() {
     local redis_json=$1
 
-    # Use 'az redis show' to get the full resource properties
-    REDIS_CACHE_NAME=$(echo "$redis_json" | jq -r '.name')
-    local redis_details
-    redis_details=$(az redis show --name "$REDIS_CACHE_NAME" --resource-group "$RESOURCE_GROUP_NAME" --subscription "$SUBSCRIPTION_ID")
+    REDIS_CACHE_NAME=$(jq -r '.name // empty' <<< "$redis_json")
+}
 
-    # Extract properties
-    REDIS_CACHE_LOCATION=$(echo "$redis_details" | jq -r '.location')
-    PUBLIC_NETWORK_ACCESS=$(echo "$redis_details" | jq -r '.publicNetworkAccess')
-    local subnet_id
-    subnet_id=$(echo "$redis_details" | jq -r '.subnetId')
-    local private_endpoints
-    private_endpoints=$(echo "$redis_details" | jq -r '.privateEndpointConnections')
+function parse_radis_details() {
+    local redis_details=$1
 
+    REDIS_CACHE_LOCATION=$(jq -r '.location // empty' <<< "$redis_details")
+    REDIS_CACHE_PUBLIC_NETWORK_ACCESS=$(jq -r '.publicNetworkAccess // empty' <<< "$redis_details")
+    REDIS_CACHE_SUBNET_ID=$(jq -r '.subnetId // empty' <<< "$redis_details")
+    REDIS_CACHE_PRIVATE_ENDPOINTS=$(jq -r '.privateEndpointConnections // empty' <<< "$redis_details")
 
-    # Default values
-    IS_VNET_INJECTED="False"
-    HAS_PRIVATE_ENDPOINT="False"
-    VIOLATION_FLAG="False"
-    REMEDIATION_STATUS="N/A"
+    REDIS_CACHE_IS_VNET_INJECTED="False"
+    REDIS_CACHE_HAS_PRIVATE_ENDPOINT="False"
+    REDIS_CACHE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG="False"
 
     # Check if the cache is VNet-injected
-    if [[ -n "$subnet_id" && "$subnet_id" != "null" ]]; then
+    if [[ -n "$REDIS_CACHE_SUBNET_ID" && "$REDIS_CACHE_SUBNET_ID" != "null" ]]; then
         IS_VNET_INJECTED="True"
     fi
     
@@ -33,14 +28,8 @@ function parse_redis_list() {
         HAS_PRIVATE_ENDPOINT="True"
     fi
 
-    # Check for violation
-    # A violation occurs only if public access is enabled AND the cache is NOT VNet-injected.
+    # A violation occurs only if public access is enabled AND the cache is NOT VNet-injected <-- this is according to the documentation
     if [[ "$PUBLIC_NETWORK_ACCESS" == "Enabled" && "$IS_VNET_INJECTED" == "False" ]]; then
         VIOLATION_FLAG="True"
-    fi
-
-    # If VNet injected, the control is not applicable
-    if [[ "$IS_VNET_INJECTED" == "True" ]]; then
-        REMEDIATION_STATUS="Not Applicable (VNet Injected)"
     fi
 }
