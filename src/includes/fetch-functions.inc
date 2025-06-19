@@ -341,3 +341,25 @@ function get_storage_account_allow_blob_public_access() {
         --query "allowBlobPublicAccess" \
         --output="json" 2>/dev/null
 }
+
+function get_azure_redis_list() {
+    local subscription_name=$1
+    local resource_group_name=$2
+
+    az redis list \
+        --subscription "$subscription_name" \
+        --resource-group "$resource_group_name" \
+        --output="json" 2>/dev/null
+}
+
+function get_azure_redis_details() {
+    local redis_cache_name=$1
+    local resource_group_name=$2
+    local subscription_id=$3
+
+    az redis show \
+        --name "$redis_cache_name" \
+        --resource-group "$resource_group_name" \
+        --subscription "$subscription_id" \
+        --output="json" 2>/dev/null
+}
