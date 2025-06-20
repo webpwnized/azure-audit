@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Reference: 2.6 Ensure that 'Public Network Access' is 'Disabled' (Manual) - CIS_Microsoft_Azure_Foundations_Benchmark_v4.0.0
+# Reference: 2.6 Ensure that 'Public Network Access' is 'Disabled' (Manual) - CIS_Microsoft_Azure_Database_Services_Benchmark_v1.0.0
 
 # Debug: ./cis-2.6-ensure-public-network-access-disabled-on-azure-cache-radis.sh -s tbd -r tbd
 
