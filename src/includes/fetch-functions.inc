@@ -363,3 +363,26 @@ function get_azure_redis_details() {
         --subscription "$l_SUBSCRIPTION_ID" \
         --output="json" 2>/dev/null
 }
+
+function get_cosmosdbs() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+
+    az cosmosdb list \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --output="json" 2>/dev/null
+}
+
+function get_cosmosdb_details() {
+    local l_SUBSCRIPTION_ID=$1
+    local l_RESOURCE_GROUP_NAME=$2
+    local l_COSMOSDB_NAME=$3
+
+    #--name might have to be --server-name or --account-name
+    az cosmosdb show \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --name "$l_COSMOSDB_NAME" \
+        --output="json" 2>/dev/null
+}
