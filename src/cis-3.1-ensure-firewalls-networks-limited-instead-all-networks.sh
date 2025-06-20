@@ -105,17 +105,27 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
     fi
 done # End of subscription loop
 
-function get_cosmosdbs() { #fix formatting and include a json
-    local subscription_name=$1
-    local resource_group_name=$2
-    az cosmosdb list --subscription "$subscription_name" --resource-group "$resource_group_name"
+function get_cosmosdbs() {
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+
+    az cosmosdb list \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --output="json" 2>/dev/null
 }
 
-function get_cosmosdb_details() { #fix formatting and include a json
-    local subscription_name=$1
-    local resource_group_name=$2
-    local cosmosdb_name=$3
-    az cosmosdb show --name "$cosmosdb_name" --resource-group "$resource_group_name" --subscription "$subscription_name"
+function get_cosmosdb_details() {
+    local l_SUBSCRIPTION_ID=$1
+    local l_RESOURCE_GROUP_NAME=$2
+    local l_COSMOSDB_NAME=$3
+
+    #--name might have to be --server-name or --account-name
+    az cosmosdb show \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --name "$l_COSMOSDB_NAME" \
+        --output="json" 2>/dev/null
 }
 
 function parse_cosmosdb_name(){
