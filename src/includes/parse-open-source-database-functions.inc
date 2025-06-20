@@ -57,7 +57,24 @@ function parse_database_server_firewall_rule() {
         DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT=$(get_org_info_from_whois "$DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS")
     fi
 
+}
 
+function parse_postgres_server() {
+    local postgres_server_json=$1
 
+    POSTGRES_SERVER_NAME=$(jq -rc '.name // empty' <<< "$postgres_server_json")
+    POSTGRES_SERVER_LOCATION=$(jq -rc '.location // empty' <<< "$postgres_server_json")
+}
 
+function parse_firewall_rules() { #TDL: see above and make sense of this
+    local firewall_rules_json=$1
+
+    POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG="False"
+
+    POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS=$(jq -rc '.[] | select(.name == "AllowAllWindowsAzureIps")' <<< "$firewall_rules_json")
+    #ZERO_IP_RULE=$(jq -rc '.[] | select(.startIpAddress == "0.0.0.0" and .endIpAddress == "0.0.0.0")' <<< "$firewall_rules_json")
+
+    if [[ -n "$POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS" ]]; then
+        POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG="True"
+    fi
 }
