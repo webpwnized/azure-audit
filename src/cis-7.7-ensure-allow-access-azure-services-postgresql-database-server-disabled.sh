@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Reference: Ensure 'Allow access to Azure services' for PostgreSQL Database Server is disabled (Automated) - CIS_Microsoft_Azure_Foundations_Benchmark_v4.0.0
+# Reference: Ensure 'Allow access to Azure services' for PostgreSQL Database Server is disabled (Automated) - CIS_Microsoft_Azure_Database_Services_Benchmark_v1.0.0
 
 # Debug: ./cis-7.7-ensure-allow-access-azure-services-postgresql-database-server-disabled.sh -s tbd -r tbd
 
