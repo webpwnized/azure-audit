@@ -57,7 +57,35 @@ function parse_database_server_firewall_rule() {
         DATABASE_SERVER_FIREWALL_RULE_WHOIS_OUTPUT=$(get_org_info_from_whois "$DATABASE_SERVER_FIREWALL_RULE_START_IP_ADDRESS")
     fi
 
+}
 
+function parse_postgres_server() {
+    local postgres_server_json=$1
 
+    POSTGRES_SERVER_NAME=$(jq -rc '.name // empty' <<< "$postgres_server_json")
+    POSTGRES_SERVER_LOCATION=$(jq -rc '.location // empty' <<< "$postgres_server_json")
+}
 
+function parse_firewall_rules() {
+    local firewall_rules_json=$1
+
+    POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS=$(jq -rc '.name // empty' <<< "$firewall_rules_json")
+    POSTGRES_SERVER_START_IP_ADDRESS=$(jq -rc '.startIpAddress // empty' <<< "$firewall_rules_json")
+    POSTGRES_SERVER_END_IP_ADDRESS=$(jq -rc '.endIpAddress // empty' <<< "$firewall_rules_json")
+
+    POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG="False"
+    POSTGRES_SERVER_START_IP_ADDRESS_VIOLATION_FLAG="False"
+    POSTGRES_SERVER_END_IP_ADDRESS_VIOLATION_FLAG="False"
+
+    if [[ "$POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS" == "AllowAllWindowsAzureIps" ]]; then
+        POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG="True"
+    fi
+
+    if [[ "$POSTGRES_SERVER_START_IP_ADDRESS" == "0.0.0.0" ]]; then
+        POSTGRES_SERVER_START_IP_ADDRESS_VIOLATION_FLAG="True"
+    fi
+
+    if [[ "$POSTGRES_SERVER_END_IP_ADDRESS" == "0.0.0.0" ]]; then
+        POSTGRES_SERVER_END_IP_ADDRESS_VIOLATION_FLAG="True"
+    fi
 }

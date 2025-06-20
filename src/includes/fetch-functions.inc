@@ -278,88 +278,88 @@ function get_mariadb_server_firewall_rules() {
 }
 
 function get_key_vaults() {
-    local subscription_name=$1
-    local resource_group_name=$2
+    local l_SUBSCRIPTION_ID=$1
+    local l_RESOURCE_GROUP_NAME=$2
 
     # Get Key Vaults list
     az keyvault list \
-        --subscription "$subscription_name" \
-        --resource-group "$resource_group_name" \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
         --output="json" 2>/dev/null
 }
 
 function get_specific_key_vault_information() {
-    local key_vault_name=$1
-    local resource_group_name=$2
+    local l_KEY_VAULT_NAME=$1
+    local l_RESOURCE_GROUP_NAME=$2
     #local subscription_name=$3 # Optional parameter if needed
 
     # Get specific Key Vault information
     az keyvault show \
-        --name "$key_vault_name" \
-        --resource-group "$resource_group_name" \
+        --name "$l_KEY_VAULT_NAME" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
         --output="json" 2>/dev/null
 }
 
 function get_storage_account_private_endpoint_access() {
-    local storage_account_name=$1
-    local resource_group_name=$2
-    local subscription_name=$3
+    local l_STORAGE_ACCOUNT_NAME=$1
+    local l_RESOURCE_GROUP_NAME=$2
+    local l_SUBSCRIPTION_ID=$3
     
     # Get Storage Account Private Endpoint Connections
     az storage account show \
-        --subscription "$subscription_name" \
-        --resource-group "$resource_group_name" \
-        --name "$storage_account_name" \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --name "$l_STORAGE_ACCOUNT_NAME" \
         --query "privateEndpointConnections[0].id" \
         --output="json" 2>/dev/null
 }
 
 function get_storage_account_network_default() {
-    local storage_account_name=$1
-    local resource_group_name=$2
-    local subscription_name=$3
+    local l_STORAGE_ACCOUNT_NAME=$1
+    local l_RESOURCE_GROUP_NAME=$2
+    local l_SUBSCRIPTION_ID=$3
     
     # Get Storage Account Network Default Action - might need to just do: networkRuleSet.defaultAction <--or try networkRuleSet.DefaultAction
     az storage account show \
-        --subscription "$subscription_name" \
-        --resource-group "$resource_group_name" \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
         --name "$storage_account_name" \
         --query "[*].networkRuleSet" \
         --output="json" 2>/dev/null
 }
 
 function get_storage_account_allow_blob_public_access() {
-    local storage_account_name=$1
-    local resource_group_name=$2
-    local subscription_name=$3
+    local l_STORAGE_ACCOUNT_NAME=$1
+    local l_RESOURCE_GROUP_NAME=$2
+    local l_SUBSCRIPTION_ID=$3
     
     # Get Storage Account Allow Blob Public Access - might just need name and not subscription nor resource name
     az storage account show \
-        --subscription "$subscription_name" \
-        --resource-group "$resource_group_name" \
-        --name "$storage_account_name" \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --name "$l_STORAGE_ACCOUNT_NAME" \
         --query "allowBlobPublicAccess" \
         --output="json" 2>/dev/null
 }
 
 function get_azure_redis_list() {
-    local subscription_name=$1
-    local resource_group_name=$2
+    local l_SUBSCRIPTION_ID=$1
+    local l_RESOURCE_GROUP_NAME=$2
 
     az redis list \
-        --subscription "$subscription_name" \
-        --resource-group "$resource_group_name" \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
         --output="json" 2>/dev/null
 }
 
 function get_azure_redis_details() {
-    local redis_cache_name=$1
-    local resource_group_name=$2
-    local subscription_id=$3
+    local l_RADIS_CACHE_NAME=$1
+    local l_RESOURCE_GROUP_NAME=$2
+    local l_SUBSCRIPTION_ID=$3
 
     az redis show \
-        --name "$redis_cache_name" \
-        --resource-group "$resource_group_name" \
-        --subscription "$subscription_id" \
+        --name "$l_RADIS_CACHE_NAME" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --subscription "$l_SUBSCRIPTION_ID" \
         --output="json" 2>/dev/null
 }
