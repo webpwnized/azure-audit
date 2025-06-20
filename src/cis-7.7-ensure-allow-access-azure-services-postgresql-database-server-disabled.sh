@@ -17,7 +17,7 @@ function output_header() {
 
 # Output CSV header
 function output_csv_header() {
-    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"POSTGRES_SERVER_NAME\",\"POSTGRES_SERVER_LOCATION\",\"POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS\",\"POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG\""
+    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"POSTGRES_SERVER_NAME\",\"POSTGRES_SERVER_LOCATION\",\"POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS\",\"POSTGRES_SERVER_START_IP_ADDRESS\",\"POSTGRES_SERVER_END_IP_ADDRESS\",\"POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG\",\"POSTGRES_SERVER_START_IP_ADDRESS_VIOLATION_FLAG\",\"POSTGRES_SERVER_END_IP_ADDRESS_VIOLATION_FLAG\""
 }
 
 # Output resource group information
@@ -36,12 +36,12 @@ function output_postgresql() {
     fi
 }
 
-# Output Key Vault information in CSV format
+# Output Postgresql information in CSV format
 function output_postgresql_csv() {
-    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$POSTGRES_SERVER_NAME\",\"$POSTGRES_SERVER_LOCATION\",\"$POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS\",\"$POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG\""
+    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$POSTGRES_SERVER_NAME\",\"$POSTGRES_SERVER_LOCATION\",\"$POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS\",\"$POSTGRES_SERVER_START_IP_ADDRESS\",\"$POSTGRES_SERVER_END_IP_ADDRESS\",\"$POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG\",\"$POSTGRES_SERVER_START_IP_ADDRESS_VIOLATION_FLAG\",\"$POSTGRES_SERVER_END_IP_ADDRESS_VIOLATION_FLAG\""
 }
 
-# Output Key Vault information in text format
+# Output Postgresql Vault information in text format
 function output_postgresql_text() {
     echo "Subscription Name: $SUBSCRIPTION_NAME"
     echo "Subscription ID: $SUBSCRIPTION_ID"
@@ -49,7 +49,11 @@ function output_postgresql_text() {
     echo "PostgreSQL Server Name: $POSTGRES_SERVER_NAME"
     echo "PostgreSQL Server Location: $POSTGRES_SERVER_LOCATION"
     echo "Allow Azure Services Access: $POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS"
+    echo "Start IP Address: $POSTGRES_SERVER_START_IP_ADDRESS"
+    echo "End IP Address: $POSTGRES_SERVER_END_IP_ADDRESS"
     echo "Violation Flag: $POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG"
+    echo "Start IP Address Violation Flag: $POSTGRES_SERVER_START_IP_ADDRESS_VIOLATION_FLAG"
+    echo "End IP Address Violation Flag: $POSTGRES_SERVER_END_IP_ADDRESS_VIOLATION_FLAG"
     echo $BLANK_LINE
 }
 
@@ -87,14 +91,20 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Postgres Server" "$POSTGRES_SERVER"
                     parse_postgres_server "$POSTGRES_SERVER"
 
-                    POSTGRES_SERVER_FIREWALL_RULES=$(get_postgres_server_firewall_rules "$KEY_VAULT_NAME" "$RESOURCE_GROUP_NAME")
+                    POSTGRES_SERVER_FIREWALL_RULES=$(get_postgres_server_firewall_rules "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$POSTGRES_SERVER_NAME")
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Postgres Server Firewall Rules" "$POSTGRES_SERVER_FIREWALL_RULES"
 
-                    # parse_key_vault_public_network_access "$KEY_VAULT_PUBLIC_NETWORK_ACCESS"
+                    if [[ $POSTGRES_SERVER_FIREWALL_RULES != "[]" ]]; then
+                        echo $POSTGRES_SERVER_FIREWALL_RULES | jq -rc '.[]' | while IFS='' read POSTGRES_SERVER_FIREWALL_RULE; do
+                            output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Postgres Server Firewall Rule" "$POSTGRES_SERVER_FIREWALL_RULE"
+                            parse_firewall_rules "$POSTGRES_SERVER_FIREWALL_RULE"
 
-                    output_postgresql_helper
-
-                done # End of Key Vault loop
+                            output_postgresql_helper
+                        done
+                    else
+                        output_user_info "No firewall rules found for Postgres Server $POSTGRES_SERVER_NAME in resource group $RESOURCE_GROUP_NAME"
+                    fi
+                done # End of PostGres Server loop
             else
                 output_user_info "No Postgres Servers found in resource group $RESOURCE_GROUP_NAME"
             fi
@@ -103,23 +113,3 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
         output_user_info "No resource groups found for subscription $SUBSCRIPTION_NAME"
     fi
 done # End of subscription loop
-
-function parse_postgres_server() {
-    local postgres_server_json=$1
-
-    # Extract properties
-    POSTGRES_SERVER_NAME=$(jq -rc '.name // empty' <<< "$postgres_server_json")
-    POSTGRES_SERVER_LOCATION=$(jq -rc '.location // empty' <<< "$postgres_server_json")
-}
-
-function parse_firewall_rules() {
-    local firewall_rules_json=$1
-
-    POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG="False"
-
-    POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS=$(jq -rc '.[] | select(.name == "AllowAllWindowsAzureIps")' <<< "$postgres_server_json")
-    
-    if [[ -n "$POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS" ]]; then
-        POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG="True"
-    fi
-}

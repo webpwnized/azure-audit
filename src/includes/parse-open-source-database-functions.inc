@@ -66,15 +66,26 @@ function parse_postgres_server() {
     POSTGRES_SERVER_LOCATION=$(jq -rc '.location // empty' <<< "$postgres_server_json")
 }
 
-function parse_firewall_rules() { #TDL: see above and make sense of this
+function parse_firewall_rules() {
     local firewall_rules_json=$1
 
+    POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS=$(jq -rc '.name // empty' <<< "$firewall_rules_json")
+    POSTGRES_SERVER_START_IP_ADDRESS=$(jq -rc '.startIpAddress // empty' <<< "$firewall_rules_json")
+    POSTGRES_SERVER_END_IP_ADDRESS=$(jq -rc '.endIpAddress // empty' <<< "$firewall_rules_json")
+
     POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG="False"
+    POSTGRES_SERVER_START_IP_ADDRESS_VIOLATION_FLAG="False"
+    POSTGRES_SERVER_END_IP_ADDRESS_VIOLATION_FLAG="False"
 
-    POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS=$(jq -rc '.[] | select(.name == "AllowAllWindowsAzureIps")' <<< "$firewall_rules_json")
-    #ZERO_IP_RULE=$(jq -rc '.[] | select(.startIpAddress == "0.0.0.0" and .endIpAddress == "0.0.0.0")' <<< "$firewall_rules_json")
-
-    if [[ -n "$POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS" ]]; then
+    if [[ "$POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS" == "AllowAllWindowsAzureIps" ]]; then
         POSTGRES_SERVER_ALLOW_AZURE_SERVICES_ACCESS_VIOLATION_FLAG="True"
+    fi
+
+    if [[ "$POSTGRES_SERVER_START_IP_ADDRESS" == "0.0.0.0" ]]; then
+        POSTGRES_SERVER_START_IP_ADDRESS_VIOLATION_FLAG="True"
+    fi
+
+    if [[ "$POSTGRES_SERVER_END_IP_ADDRESS" == "0.0.0.0" ]]; then
+        POSTGRES_SERVER_END_IP_ADDRESS_VIOLATION_FLAG="True"
     fi
 }
