@@ -102,7 +102,7 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                     STORAGE_ACCOUNT_PRIVATE_ENDPOINT=$(get_storage_account_private_endpoint_access "$STORAGE_ACCOUNT_NAME" "$RESOURCE_GROUP_NAME" "$SUBSCRIPTION_NAME")
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account Private Endpoint Access" "$STORAGE_ACCOUNT_PRIVATE_ENDPOINT"
 
-                    parse_storage_account_private_endpoint "$STORAGE_ACCOUNT_PRIVATE_ENDPOINT"
+                    parse_storage_account_private_endpoint_access "$STORAGE_ACCOUNT_PRIVATE_ENDPOINT"
 
                     output_storage_account
                 done # End of storage account loop

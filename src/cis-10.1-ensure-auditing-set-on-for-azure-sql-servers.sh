@@ -2,7 +2,7 @@
 
 #reference: 10.1 Ensure that 'Auditing' is set to on (Automated) - for Azure SQL Servers - CIS_Microsoft_Azure_Database_Services_Benchmark_v1.0.0.pdf
 
-# Debug: ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh --subscription tbd --resource-group tbd
+# Debug: ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh --subscription 651b4cdc-83bc-466a-975d-df1a9c2be5b1 --resource-group rg-PCD-dev
 
 # Source common constants and functions
 source ./includes/common-constants.inc

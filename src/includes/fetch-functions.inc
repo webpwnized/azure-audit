@@ -102,7 +102,7 @@ function get_storage_accounts() {
     az storage account list \
         --output="json" \
         --subscription="$l_SUBSCRIPTION_ID" \
-        --resource-group="$l_RESOURCE_GROUP_NAME"
+        --resource-group="$l_RESOURCE_GROUP_NAME" 2> /dev/null
 }
 
 function get_storage_account_containers() {
@@ -289,14 +289,15 @@ function get_key_vaults() {
 }
 
 function get_specific_key_vault_information() {
-    local l_KEY_VAULT_NAME=$1
+    local l_SUBSCRIPTION_ID=$1
     local l_RESOURCE_GROUP_NAME=$2
-    #local subscription_name=$3 # Optional parameter if needed
+    local l_KEY_VAULT_NAME=$3
 
     # Get specific Key Vault information
     az keyvault show \
-        --name "$l_KEY_VAULT_NAME" \
+        --subscription "$l_SUBSCRIPTION_ID" \
         --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --name "$l_KEY_VAULT_NAME" \
         --output="json" 2>/dev/null
 }
 
@@ -310,7 +311,7 @@ function get_storage_account_private_endpoint_access() {
         --subscription "$l_SUBSCRIPTION_ID" \
         --resource-group "$l_RESOURCE_GROUP_NAME" \
         --name "$l_STORAGE_ACCOUNT_NAME" \
-        --query "privateEndpointConnections[0].id" \
+        --query "privateEndpointConnections" \
         --output="json" 2>/dev/null
 }
 
@@ -323,8 +324,8 @@ function get_storage_account_network_default() {
     az storage account show \
         --subscription "$l_SUBSCRIPTION_ID" \
         --resource-group "$l_RESOURCE_GROUP_NAME" \
-        --name "$storage_account_name" \
-        --query "[*].networkRuleSet" \
+        --name "$l_STORAGE_ACCOUNT_NAME" \
+        --query "networkRuleSet" \
         --output="json" 2>/dev/null
 }
 
@@ -339,7 +340,7 @@ function get_storage_account_allow_blob_public_access() {
         --resource-group "$l_RESOURCE_GROUP_NAME" \
         --name "$l_STORAGE_ACCOUNT_NAME" \
         --query "allowBlobPublicAccess" \
-        --output="json" 2>/dev/null
+        --output="json" 2> /dev/null
 }
 
 function get_azure_redis_list() {
