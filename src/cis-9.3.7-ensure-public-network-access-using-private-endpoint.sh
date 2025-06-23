@@ -2,7 +2,7 @@
 
 # Reference: 9.3.7 Ensure that Public Network Access when using Private Endpoint is disabled (Automated) - CIS_Microsoft_Azure_Foundations_Benchmark_v4.0.0
 
-# Debug: ./cis-9.3.7-ensure-public-network-access-using-private-endpoint.sh -s tbd -r tbd
+# Debug: ./cis-9.3.7-ensure-public-network-access-using-private-endpoint.sh -s 651b4cdc-83bc-466a-975d-df1a9c2be5b1 -r rg-PCD-dev
 
 # Include common constants and functions
 source ./includes/common-constants.inc;
@@ -50,7 +50,7 @@ function output_key_vault_text() {
     echo "Key Vault Name: $KEY_VAULT_NAME"
     echo "Key Vault Location: $KEY_VAULT_LOCATION"
     echo "Public Network Access: $KEY_VAULT_PUBLIC_NETWORK_ACCESS"
-    echo "Violation Flag: $KEY_VAULT_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG"
+    echo "Public Network Access Violation Flag: $KEY_VAULT_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG"
     echo $BLANK_LINE
 }
 
@@ -86,12 +86,8 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
             if [[ "$KEY_VAULTS" != "[]" ]]; then
                 echo "$KEY_VAULTS" | jq -rc '.[]' | while IFS='' read -r KEY_VAULT; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Key Vault" "$KEY_VAULT"
-                    parse_key_vault "$KEY_VAULT"
-
-                    KEY_VAULT_PUBLIC_NETWORK_ACCESS=$(get_specific_key_vault_information "$KEY_VAULT_NAME" "$RESOURCE_GROUP_NAME")
-                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Key vault public network access" "$KEY_VAULT_PUBLIC_NETWORK_ACCESS"
-
-                    parse_key_vault_public_network_access "$KEY_VAULT_PUBLIC_NETWORK_ACCESS"
+                    
+                    parse_key_vault_public_network_access "$KEY_VAULT"
 
                     output_key_vault_helper
 

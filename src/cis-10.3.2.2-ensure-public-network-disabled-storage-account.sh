@@ -102,7 +102,7 @@ function output_storage_account_text() {
 source ./includes/common-menu.inc
 
 # Get subscriptions
-declare SUBSCRIPTIONS=$(get_subscriptions "$p_SUBSCRIPTION_ID");
+SUBSCRIPTIONS="$(get_subscriptions "$p_SUBSCRIPTION_ID")"
 output_debug_info "" "" "Subscriptions" $SUBSCRIPTIONS;
 
 check_if_subscriptions_exists "$SUBSCRIPTIONS"
@@ -139,7 +139,7 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account" "$STORAGE_ACCOUNT"
                     parse_storage_account "$STORAGE_ACCOUNT"
 
-                    if [[ STORAGE_ACCOUNT_NETWORK_RULESET_DEFAULT_ACTION == "Allow" ]]; then
+                    if [[ $STORAGE_ACCOUNT_NETWORK_RULESET_DEFAULT_ACTION == "Allow" ]]; then
                         output_user_info "Storage Account $STORAGE_ACCOUNT_NAME in Resource Group $RESOURCE_GROUP_NAME in Subscription $SUBSCRIPTION_NAME is publicly accessible."
                         exit 1
                     fi

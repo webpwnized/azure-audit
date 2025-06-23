@@ -88,7 +88,7 @@ function parse_storage_account_private_endpoint_access() {
 
     STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG="False"
 
-    if [[ -n "$STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS" ]]; then
+    if [[ "$STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS" == "[]" ]]; then
         STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG="True"
     fi
 }
@@ -96,7 +96,7 @@ function parse_storage_account_private_endpoint_access() {
 function parse_storage_account_default_network_acess() {
     STORAGE_ACCOUNT_DEFAULT_NETWORK=$1
 
-    STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE=$(jq -r '.DefaultAction // empty' <<< "$STORAGE_ACCOUNT_DEFAULT_NETWORK")
+    STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE=$(jq -r '.defaultAction // empty' <<< "$STORAGE_ACCOUNT_DEFAULT_NETWORK")
 
     STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE_VIOLATION_FLAG="False"
 

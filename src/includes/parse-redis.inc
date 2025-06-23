@@ -6,13 +6,13 @@ function parse_redis_list() {
     REDIS_CACHE_NAME=$(jq -r '.name // empty' <<< "$redis_json")
 }
 
-function parse_radis_details() {
+function parse_redis_details() {
     local redis_details=$1
 
     REDIS_CACHE_LOCATION=$(jq -r '.location // empty' <<< "$redis_details")
     REDIS_CACHE_PUBLIC_NETWORK_ACCESS=$(jq -r '.publicNetworkAccess // empty' <<< "$redis_details")
-    REDIS_CACHE_SUBNET_ID=$(jq -r '.subnetId // empty' <<< "$redis_details")
-    REDIS_CACHE_PRIVATE_ENDPOINTS=$(jq -r '.privateEndpointConnections // empty' <<< "$redis_details")
+    REDIS_CACHE_SUBNET_ID=$(jq -r '.subnetId' <<< "$redis_details") #no empty bc could be null
+    REDIS_CACHE_PRIVATE_ENDPOINTS=$(jq -r '.privateEndpointConnections' <<< "$redis_details") #no empty bc could be null
 
     REDIS_CACHE_IS_VNET_INJECTED="False"
     REDIS_CACHE_HAS_PRIVATE_ENDPOINT="False"

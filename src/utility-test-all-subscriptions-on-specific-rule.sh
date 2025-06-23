@@ -4,8 +4,10 @@
 #note: can add more filters below to speed it up
     #ie: test to see if a subscription has any sql server groups at all instead of testing in each resource of that subscription
 
-#compiling: chmod +x utility-test-all-subscriptions-on-specific-rule.sh && chmod +x cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
-#example: ./utility-test-all-subscriptions-on-specific-rule.sh -n ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
+#compiling example: chmod +x utility-test-all-subscriptions-on-specific-rule.sh && chmod +x cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
+#running example: ./utility-test-all-subscriptions-on-specific-rule.sh -n ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
+
+#WARNING: run 8.1 if want to run 8.1-8.4 as 8.2-8.4 already does the same thing as 8.1
 
 declare p_NAME_Of_SCRIPT=""; #had to use this and not the common-menu because it didn't work for some reason(ie: only write everything in one file)
 
@@ -29,7 +31,7 @@ log_dir="./logs"
 mkdir -p "$log_dir"
 
 # Get all subscription IDs
-subscriptions=$(az account list --query "[].id" -o tsv) #this is limiting what subscriptions to grab: can fix this with adding --all(ie: az account list --query "[].id" -o tsv --all) but this is inconsistent with what is being used throuhgout the other scripts, thoughts?
+subscriptions=$(az account list --query "[].id" -o tsv) #240 subscriptions, with --all it's 273
 
 if [[ -z "$subscriptions" ]]; then
     echo "❌ No subscriptions found. Make sure you're logged in with 'az login'."
@@ -49,6 +51,21 @@ for subscription in "${subscriptions_array[@]}"; do
 
     az account set --subscription "$subscription"
 
+    #commment me out if want to include visual studio subscription ids & names
+    subscription_json_list=$(az account subscription list --query "[?subscriptionId=='$subscription']" --output="json" 2>/dev/null)
+    subscription_display_name=$(jq -rc '.[0].displayName // ""' <<< "$subscription_json_list")
+    if [[ $subscription_display_name == "Visual Studio"* ]]; then
+        echo "⚠️ Skipping Visual Studio Subscription: $subscription_display_name at $subscription"
+        continue
+    fi
+
+    #uncomment below if want to filter further for cis (in terms of entire subscriptions): 7.7
+    # postgres_servers_in_subscription=$(az postgres server list --subscription="$subscription" --output="json" 2>/dev/null)
+    # if [[ "$postgres_servers_in_subscription" == "[]" ]]; then
+    #     echo "⚠️ No Postgres servers found in entire subscription: $subscription"
+    #     continue
+    # fi
+
     # Get resource groups in this subscription
     resource_groups=$(az group list --query "[].name" -o tsv)
 
@@ -61,10 +78,24 @@ for subscription in "${subscriptions_array[@]}"; do
     for rg in $resource_groups; do
         echo "▶️ Running test for $subscription / $rg"
 
-        #uncomment below if want to filter further for cis: 10.1
-        # sql_server_groups=$(az sql server list --subscription="$subscription" --resource-group="$rg")
-        # if [[ "$sql_server_groups" == "[]" ]]; then
-        #     echo "⚠️ No sql server groups found in subscription: $subscription & resource group: $rg"
+        #uncomment below if want to filter further for cis: 2.6
+        # azure_redis_list=$(az redis list --subscription="$subscription" --resource-group="$rg")
+        # if [[ "$azure_redis_list" == "[]" ]]; then
+        #     echo "⚠️ No azure redis lists found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
+
+        #uncomment below if want to filter further for cis: 3.1
+        # get_cosmosdb_list=$(az cosmosdb list --subscription="$subscription" --resource-group="$rg")
+        # if [[ "$get_cosmosdb_list" == "[]" ]]; then
+        #     echo "⚠️ No cosmosdb lists found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
+
+        #uncomment below if want to filter further for cis (in terms of entire resource groups): 7.7
+        # postgres_server_list=$(az postgres server list --subscription="$subscription" --resource-group="$rg" 2>/dev/null)
+        # if [[ "$postgres_server_list" == "[]" ]]; then
+        #     echo "⚠️ No postgres server list found in subscription: $subscription & resource group: $rg"
         #     continue
         # fi
 
@@ -72,6 +103,20 @@ for subscription in "${subscriptions_array[@]}"; do
         # key_vault_group=$(az keyvault list --subscription="$subscription" --resource-group="$rg")
         # if [[ "$key_vault_group" == "[]" ]]; then
         #     echo "⚠️ No key vault groups found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
+
+        #uncomment below if want to filter further for cis: 10.1, 10.2
+        # sql_server_groups=$(az sql server list --subscription="$subscription" --resource-group="$rg")
+        # if [[ "$sql_server_groups" == "[]" ]]; then
+        #     echo "⚠️ No sql server groups found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
+
+        #uncomment below if want to filter further for cis: 10.3.2.1, 10.3.2.2, 10.3.2.3, 10.3.9
+        # storage_account_list=$(az storage account list --subscription="$subscription" --resource-group="$rg" 2> /dev/null)
+        # if [[ "$storage_account_list" == "[]" ]]; then
+        #     echo "⚠️ No storage account list found in subscription: $subscription & resource group: $rg"
         #     continue
         # fi
 
