@@ -8,3 +8,5 @@ source ./includes/parse-sql-server-functions.inc
 source ./includes/parse-storage-account-functions.inc
 source ./includes/parse-open-source-database-functions.inc
 source ./includes/parse-key-vault.inc
+source ./includes/parse-cosmosdb.inc
+source ./includes/parse-redis.inc

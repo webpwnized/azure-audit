@@ -2,7 +2,7 @@
 
 # Reference: 3.1 Ensure that 'Firewalls & Networks' is limited to use selected networks instead of all networks (Automated) - CIS_Microsoft_Azure_Database_Services_Benchmark_v1.0.0
 
-# Debug: ./cis-3.1-ensure-firewalls-networks-limited-instead-all-networks.sh -s tbd -r tbd
+# Debug: ./cis-3.1-ensure-firewalls-networks-limited-instead-all-networks.sh -s 1014e3e6-e0cf-44c0-8efe-ba17d0c6e3ed -r rg-gts-prd
 
 # Include common constants and functions
 source ./includes/common-constants.inc;

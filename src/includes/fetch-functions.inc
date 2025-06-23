@@ -354,9 +354,9 @@ function get_azure_redis_list() {
 }
 
 function get_azure_redis_details() {
-    local l_RADIS_CACHE_NAME=$1
+    local l_SUBSCRIPTION_ID=$1
     local l_RESOURCE_GROUP_NAME=$2
-    local l_SUBSCRIPTION_ID=$3
+    local l_RADIS_CACHE_NAME=$3
 
     az redis show \
         --name "$l_RADIS_CACHE_NAME" \

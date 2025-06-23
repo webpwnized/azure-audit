@@ -10,7 +10,7 @@ function parse_cosmosdb_full() {
     local cosmosdb_details_json=$1
 
     COSMOSDB_LOCATION=$(jq -rc '.location // empty' <<< "$cosmosdb_details_json")
-    VIRTUAL_NETWORK_FILTER_ENABLED=$(jq -rc '.isVirtualNetworkFilterEnabled // empty' <<< "$cosmosdb_details_json")
+    VIRTUAL_NETWORK_FILTER_ENABLED=$(jq -rc '.isVirtualNetworkFilterEnabled' <<< "$cosmosdb_details_json") #no //empty bc false here
 
     VIRTUAL_NETWORK_FILTER_ENABLED_VIOLATION_FLAG="False"
 

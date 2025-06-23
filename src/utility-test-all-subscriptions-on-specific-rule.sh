@@ -7,6 +7,8 @@
 #compiling example: chmod +x utility-test-all-subscriptions-on-specific-rule.sh && chmod +x cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
 #running example: ./utility-test-all-subscriptions-on-specific-rule.sh -n ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
 
+#WARNING: run 8.1 if want to run 8.1-8.4 as 8.2-8.4 already does the same thing as 8.1
+
 declare p_NAME_Of_SCRIPT=""; #had to use this and not the common-menu because it didn't work for some reason(ie: only write everything in one file)
 
 while getopts "n:" option
@@ -29,7 +31,7 @@ log_dir="./logs"
 mkdir -p "$log_dir"
 
 # Get all subscription IDs
-subscriptions=$(az account list --query "[].id" -o tsv --all) #this is limiting what subscriptions to grab: can fix this with adding --all(ie: az account list --query "[].id" -o tsv --all) but this is inconsistent with what is being used throuhgout the other scripts, thoughts?
+subscriptions=$(az account list --query "[].id" -o tsv) #240 subscriptions, with --all it's 273
 
 if [[ -z "$subscriptions" ]]; then
     echo "❌ No subscriptions found. Make sure you're logged in with 'az login'."
@@ -57,6 +59,13 @@ for subscription in "${subscriptions_array[@]}"; do
         continue
     fi
 
+    #uncomment below if want to filter further for cis (in terms of entire subscriptions): 7.7
+    # postgres_servers_in_subscription=$(az postgres server list --subscription="$subscription" --output="json" 2>/dev/null)
+    # if [[ "$postgres_servers_in_subscription" == "[]" ]]; then
+    #     echo "⚠️ No Postgres servers found in entire subscription: $subscription"
+    #     continue
+    # fi
+
     # Get resource groups in this subscription
     resource_groups=$(az group list --query "[].name" -o tsv)
 
@@ -68,6 +77,27 @@ for subscription in "${subscriptions_array[@]}"; do
     # Loop through resource groups
     for rg in $resource_groups; do
         echo "▶️ Running test for $subscription / $rg"
+
+        #uncomment below if want to filter further for cis: 2.6
+        # azure_redis_list=$(az redis list --subscription="$subscription" --resource-group="$rg")
+        # if [[ "$azure_redis_list" == "[]" ]]; then
+        #     echo "⚠️ No azure redis lists found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
+
+        #uncomment below if want to filter further for cis: 3.1
+        # get_cosmosdb_list=$(az cosmosdb list --subscription="$subscription" --resource-group="$rg")
+        # if [[ "$get_cosmosdb_list" == "[]" ]]; then
+        #     echo "⚠️ No cosmosdb lists found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
+
+        #uncomment below if want to filter further for cis (in terms of entire resource groups): 7.7
+        # postgres_server_list=$(az postgres server list --subscription="$subscription" --resource-group="$rg" 2>/dev/null)
+        # if [[ "$postgres_server_list" == "[]" ]]; then
+        #     echo "⚠️ No postgres server list found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
 
         #uncomment below if want to filter further for cis: 9.3.7
         # key_vault_group=$(az keyvault list --subscription="$subscription" --resource-group="$rg")

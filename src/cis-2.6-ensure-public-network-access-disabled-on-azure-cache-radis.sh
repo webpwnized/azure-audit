@@ -2,7 +2,7 @@
 
 # Reference: 2.6 Ensure that 'Public Network Access' is 'Disabled' (Manual) - CIS_Microsoft_Azure_Database_Services_Benchmark_v1.0.0
 
-# Debug: ./cis-2.6-ensure-public-network-access-disabled-on-azure-cache-radis.sh -s tbd -r tbd
+# Debug: ./cis-2.6-ensure-public-network-access-disabled-on-azure-cache-radis.sh -s 1014e3e6-e0cf-44c0-8efe-ba17d0c6e3ed -r rg-gtc-prd
 
 # Include common constants and functions
 source ./includes/common-constants.inc;
@@ -17,7 +17,7 @@ function output_header() {
 
 # Output CSV header
 function output_csv_header() {
-    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_STATE\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"REDIS_CACHE_NAME\",\"REDIS_CACHE_LOCATION\",\"REDIS_CACHE_PUBLIC_NETWORK_ACCESS\",\"REDIS_CACHE_SUBNET_ID\",\"REDIS_CACHE_PRIVATE_ENDPOINTS\",\"AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS\",\"REDIS_CACHE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\""
+    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_STATE\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"REDIS_CACHE_NAME\",\"REDIS_CACHE_LOCATION\",\"REDIS_CACHE_PUBLIC_NETWORK_ACCESS\",\"REDIS_CACHE_SUBNET_ID\",\"REDIS_CACHE_PRIVATE_ENDPOINTS\",\"REDIS_CACHE_PRIVATE_ENDPOINTS\",\"REDIS_CACHE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\""
 }
 
 # Output resource group information
@@ -30,15 +30,15 @@ function output_redis_list_helper() {
 
 function output_redis_list() {
     if [[ $CSV == "True" ]]; then
-        output_redis_list_text
-    else
         output_redis_list_csv
+    else
+        output_redis_list_text
     fi
 }
 
 # Output Key Vault information in CSV format
 function output_redis_list_csv() {
-    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_STATE\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$REDIS_CACHE_NAME\",\"$REDIS_CACHE_LOCATION\",\"$REDIS_CACHE_PUBLIC_NETWORK_ACCESS\",\"$REDIS_CACHE_SUBNET_ID\",\"$REDIS_CACHE_PRIVATE_ENDPOINTS\",\"$AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS\",\"$REDIS_CACHE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\""
+    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_STATE\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$REDIS_CACHE_NAME\",\"$REDIS_CACHE_LOCATION\",\"$REDIS_CACHE_PUBLIC_NETWORK_ACCESS\",\"$REDIS_CACHE_SUBNET_ID\",\"$REDIS_CACHE_PRIVATE_ENDPOINTS\",\"$REDIS_CACHE_PRIVATE_ENDPOINTS\",\"$REDIS_CACHE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\""
 }
 
 # Output Key Vault information in text format
@@ -54,8 +54,8 @@ function output_redis_list_text() {
     echo "Redis Cache Private Endpoints: $REDIS_CACHE_PRIVATE_ENDPOINTS"
     echo "Redis Cache Is VNet Injected: $REDIS_CACHE_IS_VNET_INJECTED"
     echo "Redis Cache Has Private Endpoint: $REDIS_CACHE_HAS_PRIVATE_ENDPOINT"
-    echo "Azure Cache Redis Public Network Access: $AZURE_CACHE_RADIS_PUBLIC_NETWORK_ACCESS"
-    echo "Violation Flag: $REDIS_CACHE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG"
+    echo "Azure Cache Redis Public Network Access: $REDIS_CACHE_PRIVATE_ENDPOINTS"
+    echo "Azure Cache Redis Public Network Access Violation Flag: $REDIS_CACHE_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG"
     echo $BLANK_LINE
 }
 
