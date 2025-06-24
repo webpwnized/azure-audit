@@ -10,3 +10,4 @@ source ./includes/parse-open-source-database-functions.inc
 source ./includes/parse-key-vault.inc
 source ./includes/parse-cosmosdb.inc
 source ./includes/parse-redis.inc
+source ./includes/parse-mfa.inc

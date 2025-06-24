@@ -66,6 +66,13 @@ for subscription in "${subscriptions_array[@]}"; do
     #     continue
     # fi
 
+    #uncomment below if want to filter further for cis (in terms of entire subscriptions): 4.1.1
+    # role_assignments_list=$(az role assignment list --subscription "$subscription" --all --output json 2>/dev/null)
+    # if [[ $(echo "$role_assignments_list" | jq length) -eq 0 ]]; then
+    #     echo "⚠️ No role assignments lists found in subscription: $subscription & resource group: $rg"
+    #     continue
+    # fi
+
     # Get resource groups in this subscription
     resource_groups=$(az group list --query "[].name" -o tsv)
 
@@ -89,6 +96,13 @@ for subscription in "${subscriptions_array[@]}"; do
         # get_cosmosdb_list=$(az cosmosdb list --subscription="$subscription" --resource-group="$rg")
         # if [[ "$get_cosmosdb_list" == "[]" ]]; then
         #     echo "⚠️ No cosmosdb lists found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
+
+        #uncomment below if want to filter further for cis (in terms of entire resource groups): 4.1.1
+        # role_assignments_list=$(az role assignment list --subscription "$subscription" --all --output json 2>/dev/null)
+        # if [[ $(echo "$role_assignments_list" | jq length) -eq 0 ]]; then
+        #     echo "⚠️ No role assignments lists found in subscription: $subscription & resource group: $rg"
         #     continue
         # fi
 
