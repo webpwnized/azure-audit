@@ -387,3 +387,31 @@ function get_cosmosdb_details() {
         --name "$l_COSMOSDB_NAME" \
         --output="json" 2>/dev/null
 }
+
+function get_role_assignments() {
+    local l_SUBSCRIPTION_ID=$1
+    local l_RESOURCE_GROUP_NAME=$2
+
+    az role assignment list \
+        --subscription "$l_SUBSCRIPTION_ID" \
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --all \
+        --output="json" 2>/dev/null
+}
+
+function get_mfa_enforced() {
+    local l_PRINCIPAL_NAME=$1
+
+    az ad user show \
+        --id "$l_PRINCIPAL_NAME" \
+        --query "userState"
+        --output="json" 2>/dev/null
+}
+
+function get_mfa_exempt_policy() {
+    local l_PRINCIPAL_NAME=$1
+
+    az ad conditional-access policy list \
+        --query "[?contains(excludeUsers, '$IDENTITY')]" \
+        --output="json" 2>/dev/null
+}
