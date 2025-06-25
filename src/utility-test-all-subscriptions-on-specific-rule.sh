@@ -5,7 +5,8 @@
     #ie: test to see if a subscription has any sql server groups at all instead of testing in each resource of that subscription
 
 #compiling example: chmod +x utility-test-all-subscriptions-on-specific-rule.sh && chmod +x cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
-#running example: ./utility-test-all-subscriptions-on-specific-rule.sh -n ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
+#running example without csv output: ./utility-test-all-subscriptions-on-specific-rule.sh -n ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
+    #running example with csv output: ./utility-test-all-subscriptions-on-specific-rule.sh -n ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh -c
 
 #WARNING: run 8.1 if want to run 8.1-8.4 as 8.2-8.4 already does the same thing as 8.1
 
@@ -105,11 +106,11 @@ for subscription in "${subscriptions_array[@]}"; do
         # fi
 
         #uncomment below if want to filter further for cis: 9.3.7
-        key_vault_group=$(az keyvault list --subscription="$subscription" --resource-group="$rg")
-        if [[ "$key_vault_group" == "[]" ]]; then
-            echo "⚠️ No key vault groups found in subscription: $subscription & resource group: $rg"
-            continue
-        fi
+        # key_vault_group=$(az keyvault list --subscription="$subscription" --resource-group="$rg")
+        # if [[ "$key_vault_group" == "[]" ]]; then
+        #     echo "⚠️ No key vault groups found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
 
         #uncomment below if want to filter further for cis: 10.1, 10.2
         # sql_server_groups=$(az sql server list --subscription="$subscription" --resource-group="$rg")
