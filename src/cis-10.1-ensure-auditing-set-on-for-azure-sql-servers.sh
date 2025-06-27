@@ -2,7 +2,7 @@
 
 #reference: 10.1 Ensure that 'Auditing' is set to on (Automated) - for Azure SQL Servers - CIS_Microsoft_Azure_Database_Services_Benchmark_v1.0.0.pdf
 
-# Debug: ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh --subscription 651b4cdc-83bc-466a-975d-df1a9c2be5b1 --resource-group rg-PCD-dev
+# Debug: ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh -s SUBSCRIPTION_ID -r RESOURCE_NAME --debug
 
 # Source common constants and functions
 source ./includes/common-constants.inc
@@ -17,7 +17,7 @@ function output_header() {
 
 # Output CSV header
 function output_csv_header() {
-    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"SQL_SERVER_NAME\",\"SQL_SERVER_LOCATION\",\"SQL_SERVER_AUDITING_ENABLED\",\"SQL_SERVER_AUDITING_ENABLED_FLAG\""
+    echo "SUBSCRIPTION_NAME,SUBSCRIPTION_ID,RESOURCE_GROUP_NAME,SQL_SERVER_NAME,SQL_SERVER_LOCATION,SQL_SERVER_AUDITING_ENABLED,SQL_SERVER_AUDITING_ENABLED_FLAG"
 }
 
 # Output resource group information
@@ -39,7 +39,7 @@ function output_sql_server_audit_helper() {
 
 # Output resource group information in CSV format
 function output_sql_server_audit_csv() {
-    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$SQL_SERVER_NAME\",\"$SQL_SERVER_LOCATION\",\"$SQL_SERVER_AUDITING_ENABLED\",\"$SQL_SERVER_AUDITING_ENABLED_FLAG\""
+    echo "$SUBSCRIPTION_NAME,$SUBSCRIPTION_ID,$RESOURCE_GROUP_NAME,$SQL_SERVER_NAME,$SQL_SERVER_LOCATION,$SQL_SERVER_AUDITING_ENABLED,$SQL_SERVER_AUDITING_ENABLED_FLAG"
 }
 
 # Output resource group information in text format

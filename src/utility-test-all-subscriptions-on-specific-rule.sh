@@ -5,18 +5,23 @@
     #ie: test to see if a subscription has any sql server groups at all instead of testing in each resource of that subscription
 
 #compiling example: chmod +x utility-test-all-subscriptions-on-specific-rule.sh && chmod +x cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
-#running example: ./utility-test-all-subscriptions-on-specific-rule.sh -n ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
+#running example without csv output: ./utility-test-all-subscriptions-on-specific-rule.sh -n ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh
+    #running example with csv output: ./utility-test-all-subscriptions-on-specific-rule.sh -n ./cis-10.1-ensure-auditing-set-on-for-azure-sql-servers.sh -c
 
 #WARNING: run 8.1 if want to run 8.1-8.4 as 8.2-8.4 already does the same thing as 8.1
 
 declare p_NAME_Of_SCRIPT=""; #had to use this and not the common-menu because it didn't work for some reason(ie: only write everything in one file)
+declare p_CSV="False";
 
-while getopts "n:" option
+while getopts "n:c" option
 do 
     case "${option}" in
         n)
             # Set name of the script
             p_NAME_Of_SCRIPT="${OPTARG}";;
+        c)
+            # Set csv flag to true
+            p_CSV="True";;
     esac;
 done;
 
@@ -31,7 +36,8 @@ log_dir="./logs"
 mkdir -p "$log_dir"
 
 # Get all subscription IDs
-subscriptions=$(az account list --query "[].id" -o tsv) #240 subscriptions, with --all it's 273
+subscriptions=$(az account list --query "[].id" -o tsv) #240 subscriptions, with --all it's 271
+# subscriptions="sub-id-1 sub-id-2 sub-id-3 sub-id-4 sub-id-5" #this is just an example if want to use a hard coded list
 
 if [[ -z "$subscriptions" ]]; then
     echo "❌ No subscriptions found. Make sure you're logged in with 'az login'."
@@ -134,9 +140,17 @@ for subscription in "${subscriptions_array[@]}"; do
         #     continue
         # fi
 
-        log_file="${log_dir}/${subscription}_${rg}.log"
-        $script_name --subscription "$subscription" --resource-group "$rg" > "$log_file" 2>&1 #might need --debug
-
+        log_file="${log_dir}/csvOutput.csv"
+        if [[ $p_CSV == "False" ]]; then
+            log_file="${log_dir}/${subscription}_${rg}.log"
+            $script_name --subscription "$subscription" --resource-group "$rg" > "$log_file" 2>&1 #can include --debug here but not recommended
+        else
+            if [[ ! -f "$log_file" ]]; then
+                $script_name --subscription "$subscription" --resource-group "$rg" --csv > "$log_file" 2>&1
+            else
+                $script_name --subscription "$subscription" --resource-group "$rg" --csv | tail -n +2 >> "$log_file" 2>&1
+            fi
+        fi
         echo "✅ Completed: $subscription / $rg"
         echo "📝 Output logged to $log_file"
         echo "-------------------------------------------------------------------------"

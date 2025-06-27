@@ -2,7 +2,7 @@
 
 # Reference: 3.1 Ensure that 'Firewalls & Networks' is limited to use selected networks instead of all networks (Automated) - CIS_Microsoft_Azure_Database_Services_Benchmark_v1.0.0
 
-# Debug: ./cis-3.1-ensure-firewalls-networks-limited-instead-all-networks.sh -s 1014e3e6-e0cf-44c0-8efe-ba17d0c6e3ed -r rg-gts-prd
+# Debug: ./cis-3.1-ensure-firewalls-networks-limited-instead-all-networks.sh -s SUBSCRIPTION_ID -r RESOURCE_NAME --debug
 
 # Include common constants and functions
 source ./includes/common-constants.inc;
@@ -17,7 +17,7 @@ function output_header() {
 
 # Output CSV header
 function output_csv_header() {
-    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_STATE\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"COSMOSDB_NAME\",\"COSMOSDB_LOCATION\",\"VIRTUAL_NETWORK_FILTER_ENABLED\",\"VIRTUAL_NETWORK_FILTER_ENABLED_VIOLATION_FLAG\""
+    echo "SUBSCRIPTION_NAME,SUBSCRIPTION_STATE,SUBSCRIPTION_ID,RESOURCE_GROUP_NAME,COSMOSDB_NAME,COSMOSDB_LOCATION,VIRTUAL_NETWORK_FILTER_ENABLED,VIRTUAL_NETWORK_FILTER_ENABLED_VIOLATION_FLAG"
 }
 
 # Output resource group information
@@ -38,7 +38,7 @@ function output_cosmosdb_vault() {
 
 # Output CosmosDB information in CSV format
 function output_cosmosdb_csv() {
-    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_STATE\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$COSMOSDB_NAME\",\"$COSMOSDB_LOCATION\",\"$VIRTUAL_NETWORK_FILTER_ENABLED\",\"$VIRTUAL_NETWORK_FILTER_ENABLED_VIOLATION_FLAG\""
+    echo "$SUBSCRIPTION_NAME,$SUBSCRIPTION_STATE,$SUBSCRIPTION_ID,$RESOURCE_GROUP_NAME,$COSMOSDB_NAME,$COSMOSDB_LOCATION,$VIRTUAL_NETWORK_FILTER_ENABLED,$VIRTUAL_NETWORK_FILTER_ENABLED_VIOLATION_FLAG"
 }
 
 # Output CosmosDB information in text format

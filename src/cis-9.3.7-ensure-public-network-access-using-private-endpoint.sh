@@ -2,7 +2,7 @@
 
 # Reference: 9.3.7 Ensure that Public Network Access when using Private Endpoint is disabled (Automated) - CIS_Microsoft_Azure_Foundations_Benchmark_v4.0.0
 
-# Debug: ./cis-9.3.7-ensure-public-network-access-using-private-endpoint.sh -s 651b4cdc-83bc-466a-975d-df1a9c2be5b1 -r rg-PCD-dev
+# Debug: ./cis-9.3.7-ensure-public-network-access-using-private-endpoint.sh -s SUBSCRIPTION_ID -r RESOURCE_NAME --debug
 
 # Include common constants and functions
 source ./includes/common-constants.inc;
@@ -17,7 +17,7 @@ function output_header() {
 
 # Output CSV header
 function output_csv_header() {
-    echo "\"SUBSCRIPTION_NAME\",\"SUBSCRIPTION_STATE\",\"SUBSCRIPTION_ID\",\"RESOURCE_GROUP_NAME\",\"KEY_VAULT_NAME\",\"KEY_VAULT_LOCATION\",\"PUBLIC_NETWORK_ACCESS\",\"VIOLATION_FLAG\""
+    echo "SUBSCRIPTION_NAME,SUBSCRIPTION_STATE,SUBSCRIPTION_ID,RESOURCE_GROUP_NAME,KEY_VAULT_NAME,KEY_VAULT_LOCATION,KEY_VAULT_PUBLIC_NETWORK_ACCESS,KEY_VAULT_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG"
 }
 
 # Output resource group information
@@ -38,7 +38,7 @@ function output_key_vault() {
 
 # Output Key Vault information in CSV format
 function output_key_vault_csv() {
-    echo "\"$SUBSCRIPTION_NAME\",\"$SUBSCRIPTION_STATE\",\"$SUBSCRIPTION_ID\",\"$RESOURCE_GROUP_NAME\",\"$KEY_VAULT_NAME\",\"$KEY_VAULT_LOCATION\",\"$KEY_VAULT_PUBLIC_NETWORK_ACCESS\",\"$KEY_VAULT_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG\""
+    echo "$SUBSCRIPTION_NAME,$SUBSCRIPTION_STATE,$SUBSCRIPTION_ID,$RESOURCE_GROUP_NAME,$KEY_VAULT_NAME,$KEY_VAULT_LOCATION,$KEY_VAULT_PUBLIC_NETWORK_ACCESS,$KEY_VAULT_PUBLIC_NETWORK_ACCESS_VIOLATION_FLAG"
 }
 
 # Output Key Vault information in text format
