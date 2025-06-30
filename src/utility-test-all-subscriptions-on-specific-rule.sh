@@ -119,6 +119,13 @@ for subscription in "${subscriptions_array[@]}"; do
         #     continue
         # fi
 
+        #uncomment below if want to filter further for cis: 8.1, 8.2, 8.3, 8.4
+        # network_security_group_list=$(az network nsg list --subscription="$subscription" --resource-group="$rg" 2>/dev/null)
+        # if [[ "$network_security_group_list" == "[]" ]]; then
+        #     echo "⚠️ No network security groups found in subscription: $subscription & resource group: $rg"
+        #     continue
+        # fi
+
         #uncomment below if want to filter further for cis: 9.3.7
         # key_vault_group=$(az keyvault list --subscription="$subscription" --resource-group="$rg")
         # if [[ "$key_vault_group" == "[]" ]]; then

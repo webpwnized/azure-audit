@@ -6,10 +6,10 @@ function parse_storage_account() {
     STORAGE_ACCOUNT_NAME=$(jq -r '.name' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_LOCATION=$(jq -r '.location' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_KIND=$(jq -r '.kind' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS=$(jq -r '.properties.allowBlobPublicAccess' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_ALLOW_SHARED_KEY_ACCESS=$(jq -r '.properties.allowSharedKeyAccess' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_AZURE_FILES_IDENTITY_BASED_AUTHENTICATION=$(jq -r '.properties.azureFilesIdentityBasedAuthentication' <<< "$STORAGE_ACCOUNT")
-    STORAGE_ACCOUNT_ENABLE_HTTPS_ONLY=$(jq -r '.properties.enableHttpsOnly' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS=$(jq -r '.allowBlobPublicAccess' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_ALLOW_SHARED_KEY_ACCESS=$(jq -r '.allowSharedKeyAccess' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_AZURE_FILES_IDENTITY_BASED_AUTHENTICATION=$(jq -r '.azureFilesIdentityBasedAuthentication' <<< "$STORAGE_ACCOUNT")
+    STORAGE_ACCOUNT_ENABLE_HTTPS_ONLY=$(jq -r '.enableHttpsOnly' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_BLOB=$(jq -r '.primaryEndpoints.blob' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_DFS=$(jq -r '.primaryEndpoints.dfs' <<< "$STORAGE_ACCOUNT")
     STORAGE_ACCOUNT_PRIMARY_ENDPOINTS_FILE=$(jq -r '.primaryEndpoints.file' <<< "$STORAGE_ACCOUNT")
@@ -75,6 +75,22 @@ function parse_storage_account() {
     if [ "$STORAGE_ACCOUNT_IS_LOCAL_USER_ENABLED" == "true" ]; then
         STORAGE_ACCOUNT_LOCAL_USER_ENABLED_VIOLATION_FLAG="True"
     fi
+
+    if [ "$STORAGE_ACCOUNT_NETWORK_RULESET_VIRTUAL_NETWORK_RULES" != "[]" ]; then
+        STORAGE_ACCOUNT_NETWORK_RULESET_VIRTUAL_NETWORK_RULES="Virtual Network Rules Exist"
+    fi
+
+    if [ "$STORAGE_ACCOUNT_NETWORK_RULESET_IP_RULES" != "[]" ]; then
+        STORAGE_ACCOUNT_NETWORK_RULESET_IP_RULES="IP Rules Exist"
+    fi
+
+    if [ "$STORAGE_ACCOUNT_AZURE_FILES_IDENTITY_BASED_AUTHENTICATION" != "[]" ]; then
+        STORAGE_ACCOUNT_AZURE_FILES_IDENTITY_BASED_AUTHENTICATION="Azure Files Identity Based Authentication Exists"
+    fi
+
+    if [[ "$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS" != "false" ]]; then
+        STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG="True"
+    fi
 }
 
 function parse_storage_account_containers() {
@@ -90,6 +106,8 @@ function parse_storage_account_private_endpoint_access() {
 
     if [[ "$STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS" == "[]" ]]; then
         STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG="True"
+    else
+        STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS="Private Endpoint Does Exist"
     fi
 }
 
@@ -102,15 +120,5 @@ function parse_storage_account_default_network_acess() {
 
     if [[ "$STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE" != "Deny" ]]; then
         STORAGE_ACCOUNT_DEFAULT_NETWORK_ACCESS_RULE_VIOLATION_FLAG="True"
-    fi
-}
-
-function parse_storage_account_allow_blob_public_access() {
-    STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS=$1
-
-    STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG="False"
-
-    if [[ "$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS" != "false" ]]; then
-        STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG="True"
     fi
 }

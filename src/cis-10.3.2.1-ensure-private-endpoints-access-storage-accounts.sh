@@ -19,7 +19,7 @@ function output_header() {
 # Output CSV header
 function output_csv_header() {
     # Output CSV header line
-    echo "SUBSCRIPTION_NAME,SUBSCRIPTION_STATE,RESOURCE_GROUP_NAME,STORAGE_ACCOUNT_NAME,STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS,STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG"
+    echo "SUBSCRIPTION_NAME,SUBSCRIPTION_STATE,SUBSCRIPTION_ID,RESOURCE_GROUP_NAME,STORAGE_ACCOUNT_NAME,STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS,STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG"
 }
 
 # Output resource group information
@@ -43,14 +43,14 @@ function output_storage_account_helper() {
 # Output resource group information in CSV format
 function output_storage_account_csv() {
     # Output resource group details in CSV format
-    echo "$SUBSCRIPTION_NAME,$SUBSCRIPTION_STATE,$RESOURCE_GROUP_NAME,$STORAGE_ACCOUNT_NAME,$STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS,$STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG"
+    echo "$SUBSCRIPTION_NAME,$SUBSCRIPTION_STATE,$SUBSCRIPTION_ID,$RESOURCE_GROUP_NAME,$STORAGE_ACCOUNT_NAME,$STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS,$STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS_VIOLATION_FLAG"
 }
 
 # Output resource group information in text format
 function output_storage_account_text() {
-    # Output resource group details in text format
     echo "Subscription Name: $SUBSCRIPTION_NAME"
     echo "Subscription State: $SUBSCRIPTION_STATE"
+    echo "Subscription ID: $SUBSCRIPTION_ID"
     echo "Resource Group Name: $RESOURCE_GROUP_NAME"
     echo "Storage Account Name: $STORAGE_ACCOUNT_NAME"
     echo "Storage Account Private Endpoint Access: $STORAGE_ACCOUNT_PRIVATE_ENDPOINT_ACCESS"

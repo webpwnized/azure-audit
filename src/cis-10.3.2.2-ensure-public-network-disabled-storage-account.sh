@@ -86,7 +86,7 @@ function output_storage_account_text() {
     echo "Storage Account Network Ruleset Default Action: $STORAGE_ACCOUNT_NETWORK_RULESET_DEFAULT_ACTION"
     echo "Storage Account Public Network Access: $STORAGE_ACCOUNT_PUBLIC_NETWORK_ACCESS"
     echo "Storage Account SAS Policy: $STORAGE_ACCOUNT_SAS_POLICY"
-    echo "Storage Account Containers: $STORAGE_ACCOUNT_CONTAINERS"
+    echo "Storage Account Containers (inconclusive if empty): $STORAGE_ACCOUNT_CONTAINERS"
     echo "Storage Account Allow Blob Public Access Violation: $STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG"
     echo "Storage Account Allow Shared Key Access Violation: $STORAGE_ACCOUNT_ALLOW_SHARED_KEY_ACCESS_VIOLATION_FLAG"
     echo "Storage Account Enable HTTPS Only Violation: $STORAGE_ACCOUNT_ENABLE_HTTPS_ONLY_VIOLATION_FLAG"
@@ -139,13 +139,9 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account" "$STORAGE_ACCOUNT"
                     parse_storage_account "$STORAGE_ACCOUNT"
 
-                    if [[ $STORAGE_ACCOUNT_NETWORK_RULESET_DEFAULT_ACTION == "Allow" ]]; then
-                        output_user_info "Storage Account $STORAGE_ACCOUNT_NAME in Resource Group $RESOURCE_GROUP_NAME in Subscription $SUBSCRIPTION_NAME is publicly accessible."
-                        exit 1
-                    fi
-
-                    STORAGE_ACCOUNT_CONTAINERS=$(get_storage_account_containers "$STORAGE_ACCOUNT_NAME" "$SUBSCRIPTION_NAME") 
+                    STORAGE_ACCOUNT_CONTAINERS=$(get_storage_account_containers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "$STORAGE_ACCOUNT_NAME") 
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account Containers" "$STORAGE_ACCOUNT_CONTAINERS"
+                    
                     parse_storage_account_containers "$STORAGE_ACCOUNT_CONTAINERS"
 
                     output_storage_account
