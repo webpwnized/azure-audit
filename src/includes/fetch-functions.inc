@@ -106,15 +106,16 @@ function get_storage_accounts() {
 }
 
 function get_storage_account_containers() {
-    local l_STORAGE_ACCOUNT_NAME="$1"
-    local l_SUBSCRIPTION_ID="$2"
-    
+    local l_SUBSCRIPTION_ID="$1"
+    local l_RESOURCE_GROUP_NAME="$2"
+    local l_STORAGE_ACCOUNT_NAME="$3"
+
     # Get Storage Account Containers
     az storage container list \
-        --account-name "$l_STORAGE_ACCOUNT_NAME" \
         --subscription "$l_SUBSCRIPTION_ID" \
-        --output="json" \
-        2>/dev/null
+        --resource-group "$l_RESOURCE_GROUP_NAME" \
+        --account-name "$l_STORAGE_ACCOUNT_NAME" \
+        --output="json" 2>/dev/null
 }
 
 # Function to get Azure SQL servers

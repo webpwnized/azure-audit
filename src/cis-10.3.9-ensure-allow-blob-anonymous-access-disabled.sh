@@ -19,7 +19,7 @@ function output_header() {
 # Output CSV header
 function output_csv_header() {
     # Output CSV header line
-    echo "SUBSCRIPTION_NAME,SUBSCRIPTION_STATE,RESOURCE_GROUP_NAME,STORAGE_ACCOUNT_NAME,STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS,STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG"
+    echo "SUBSCRIPTION_NAME,SUBSCRIPTION_STATE,SUBSCRIPTION_ID,RESOURCE_GROUP_NAME,STORAGE_ACCOUNT_NAME,STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS,STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG"
 }
 
 # Output resource group information
@@ -43,7 +43,7 @@ function output_storage_account_helper() {
 # Output resource group information in CSV format
 function output_storage_account_csv() {
     # Output resource group details in CSV format
-    echo "$SUBSCRIPTION_NAME,$SUBSCRIPTION_STATE,$RESOURCE_GROUP_NAME,$STORAGE_ACCOUNT_NAME,$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS,$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG"
+    echo "$SUBSCRIPTION_NAME,$SUBSCRIPTION_STATE,$SUBSCRIPTION_ID,$RESOURCE_GROUP_NAME,$STORAGE_ACCOUNT_NAME,$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS,$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS_VIOLATION_FLAG"
 }
 
 # Output resource group information in text format
@@ -51,6 +51,7 @@ function output_storage_account_text() {
     # Output resource group details in text format
     echo "Subscription Name: $SUBSCRIPTION_NAME"
     echo "Subscription State: $SUBSCRIPTION_STATE"
+    echo "Subscription ID: $SUBSCRIPTION_ID"
     echo "Resource Group Name: $RESOURCE_GROUP_NAME"
     echo "Storage Account Name: $STORAGE_ACCOUNT_NAME"
     echo "Storage Account Private Endpoint Access: $STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC_ACCESS"
@@ -98,11 +99,6 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
                 echo $STORAGE_ACCOUNTS | jq -rc '.[]' | while IFS='' read STORAGE_ACCOUNT; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account" "$STORAGE_ACCOUNT"
                     parse_storage_account "$STORAGE_ACCOUNT"
-
-                    STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC=$(get_storage_account_allow_blob_public_access "$STORAGE_ACCOUNT_NAME" "$RESOURCE_GROUP_NAME" "$SUBSCRIPTION_NAME")
-                    output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account Private Endpoint Access" "$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC"
-
-                    parse_storage_account_allow_blob_public_access "$STORAGE_ACCOUNT_ALLOW_BLOB_PUBLIC"
 
                     output_storage_account
                 done # End of storage account loop
