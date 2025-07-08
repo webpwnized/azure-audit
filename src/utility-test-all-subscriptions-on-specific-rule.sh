@@ -92,11 +92,11 @@ for subscription in "${subscriptions_array[@]}"; do
         echo "▶️ Running test for $subscription / $rg"
 
         #uncomment below if want to filter further for cis: 2.6
-        # azure_redis_list=$(az redis list --subscription="$subscription" --resource-group="$rg")
-        # if [[ "$azure_redis_list" == "[]" ]]; then
-        #     echo "⚠️ No azure redis lists found in subscription: $subscription & resource group: $rg"
-        #     continue
-        # fi
+        azure_redis_list=$(az redis list --subscription="$subscription" --resource-group="$rg")
+        if [[ "$azure_redis_list" == "[]" ]]; then
+            echo "⚠️ No azure redis lists found in subscription: $subscription & resource group: $rg"
+            continue
+        fi
 
         #uncomment below if want to filter further for cis: 3.1
         # get_cosmosdb_list=$(az cosmosdb list --subscription="$subscription" --resource-group="$rg")
