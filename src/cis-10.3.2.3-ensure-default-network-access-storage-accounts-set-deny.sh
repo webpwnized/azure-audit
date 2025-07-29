@@ -101,6 +101,7 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
             STORAGE_ACCOUNTS=$(get_storage_accounts "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
             output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Accounts" "$STORAGE_ACCOUNTS"
             
+            # Process each storage account
             if [[ $STORAGE_ACCOUNTS != "[]" ]]; then
                 echo $STORAGE_ACCOUNTS | jq -rc '.[]' | while IFS='' read STORAGE_ACCOUNT; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Storage Account" "$STORAGE_ACCOUNT"

@@ -81,6 +81,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
     declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME")
     output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Groups" "$RESOURCE_GROUPS"
 
+    # Process each resource group
     if [[ $RESOURCE_GROUPS != "[]" ]]; then
         echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
             output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Group" "$RESOURCE_GROUP"
@@ -89,6 +90,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
             COSMOSDBS=$(get_cosmosdbs "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
             output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "CosmosDB" "$COSMOSDBS"
             
+            # Process each CosmosDB account
             if [[ "$COSMOSDBS" != "[]" ]]; then
                 echo "$COSMOSDBS" | jq -rc '.[]' | while IFS='' read -r COSMOSDB; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "CosmosDB" "$COSMOSDB"

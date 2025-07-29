@@ -87,6 +87,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
     declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME")
     output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Groups" "$RESOURCE_GROUPS"
 
+    # Process each resource group
     if [[ $RESOURCE_GROUPS != "[]" ]]; then
         echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
             output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Group" "$RESOURCE_GROUP"
@@ -95,6 +96,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
             ROLE_ASSIGNMENTS=$(get_role_assignments "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
             output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Role Assignments" "$ROLE_ASSIGNMENTS"
             
+            # Process each role assignment
             if [[ "$ROLE_ASSIGNMENTS" != "[]" ]]; then
                 echo "$ROLE_ASSIGNMENTS" | jq -rc '.[]' | while IFS='' read -r ROLE_ASSIGNMENT; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Role Assignment" "$ROLE_ASSIGNMENT"
@@ -107,6 +109,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
                     MFA_ENFORCED=$(get_mfa_enforced "$PRINCIPAL_NAME")
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "MFA Enforced" "$MFA_ENFORCED"
 
+                    # Determine MFA status based on enforcement
                     if [[ $MFA_ENFORCED == "Enabled" ]]; then
                         MFA_STATUS="Enabled"
                         VIOLATION_FLAG="False"
