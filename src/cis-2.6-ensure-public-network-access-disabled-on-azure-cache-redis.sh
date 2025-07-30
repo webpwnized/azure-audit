@@ -2,7 +2,7 @@
 
 # Reference: 2.6 Ensure that 'Public Network Access' is 'Disabled' (Manual) - CIS_Microsoft_Azure_Database_Services_Benchmark_v1.0.0
 
-# Debug: ./cis-2.6-ensure-public-network-access-disabled-on-azure-cache-radis.sh -s SUBSCRIPTION_ID -r RESOURCE_NAME --debug
+# Debug: ./cis-2.6-ensure-public-network-access-disabled-on-azure-cache-redis.sh -s SUBSCRIPTION_ID -r RESOURCE_NAME --debug
 
 # Include common constants and functions
 source ./includes/common-constants.inc;
@@ -85,6 +85,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
     declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME")
     output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Groups" "$RESOURCE_GROUPS"
 
+    # Process each resource group
     if [[ $RESOURCE_GROUPS != "[]" ]]; then
         echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
             output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Group" "$RESOURCE_GROUP"
@@ -93,6 +94,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
             REDIS_LISTS=$(get_azure_redis_list "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
             output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Redis Lists" "$REDIS_LISTS"
             
+            # Process each Redis list
             if [[ "$REDIS_LISTS" != "[]" ]]; then
                 echo "$REDIS_LISTS" | jq -rc '.[]' | while IFS='' read -r REDIS_LIST; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Redis List" "$REDIS_LIST"

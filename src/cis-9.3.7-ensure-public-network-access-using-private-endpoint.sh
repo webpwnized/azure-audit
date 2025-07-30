@@ -81,6 +81,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
     declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME")
     output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Groups" "$RESOURCE_GROUPS"
 
+    # Process each resource group
     if [[ $RESOURCE_GROUPS != "[]" ]]; then
         echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
             output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Group" "$RESOURCE_GROUP"
@@ -89,6 +90,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
             KEY_VAULTS=$(get_key_vaults "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
             output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Key vaults" "$KEY_VAULTS"
             
+            # Process each Key Vault
             if [[ "$KEY_VAULTS" != "[]" ]]; then
                 echo "$KEY_VAULTS" | jq -rc '.[]' | while IFS='' read -r KEY_VAULT; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Key Vault" "$KEY_VAULT"

@@ -85,6 +85,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
     declare RESOURCE_GROUPS=$(get_resource_groups "$SUBSCRIPTION_NAME" "$p_RESOURCE_GROUP_NAME")
     output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Groups" "$RESOURCE_GROUPS"
 
+    # Process each resource group
     if [[ $RESOURCE_GROUPS != "[]" ]]; then
         echo $RESOURCE_GROUPS | jq -rc '.[]' | while IFS='' read RESOURCE_GROUP; do
             output_debug_info "$SUBSCRIPTION_NAME" "" "Resource Group" "$RESOURCE_GROUP"
@@ -93,6 +94,7 @@ echo "$SUBSCRIPTIONS" | jq -rc '.[]' | while IFS='' read -r SUBSCRIPTION; do
             POSTGRES_SERVERS=$(get_postgres_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
             output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Postgres Servers" "$POSTGRES_SERVERS"
             
+            # Process each Postgres server
             if [[ "$POSTGRES_SERVERS" != "[]" ]]; then
                 echo "$POSTGRES_SERVERS" | jq -rc '.[]' | while IFS='' read -r POSTGRES_SERVER; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "Postgres Server" "$POSTGRES_SERVER"

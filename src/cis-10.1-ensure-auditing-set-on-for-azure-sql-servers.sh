@@ -93,6 +93,7 @@ echo $SUBSCRIPTIONS | jq -rc '.[]' | while IFS='' read SUBSCRIPTION; do
             declare SQL_SERVERS=$(get_azure_sql_servers "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME")
             output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "SQL Servers" "$SQL_SERVERS"
 
+            # Process each SQL server
             if [[ $SQL_SERVERS != "[]" ]]; then
                 echo $SQL_SERVERS | jq -rc '.[]' | while IFS='' read SQL_SERVER; do
                     output_debug_info "$SUBSCRIPTION_NAME" "$RESOURCE_GROUP_NAME" "SQL Server" "$SQL_SERVER"
